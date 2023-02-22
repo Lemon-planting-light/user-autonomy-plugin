@@ -156,65 +156,62 @@ function init(api) {
       },
     });
   });
-  api.attachWidgetAction("topic-OP-admin-menu", "topicOPtoggleClose", function () {
-    const topic = this.register.lookup("controller:topic");
-    const dialog = this.register.lookup("service:dialog");
+
+  function sendToggleOPActionAjax(helper, status, reason, model) {
+    const topic = helper.register.lookup("controller:topic");
+    const dialog = helper.register.lookup("service:dialog");
+    reason = reason || I18n.t("topic_op_admin.default_reason");
     ajax("/topic_op_admin/update_topic_status/", {
       method: "POST",
       data: {
-        id: this.attrs.topic.id,
-        status: "closed",
-        enabled: !this.attrs.topic.closed,
+        id: helper.attrs.topic.id,
+        status,
+        enabled: !helper.attrs.topic[status],
+        reason,
       },
     })
       .then((res) => {
+        if (model) {
+          model.setProperties({ loading: false });
+          model.send("closeModal");
+        }
         if (!res.success) {
           dialog.alert(res.message);
         } else {
-          topic.model.toggleProperty("closed");
+          topic.model.toggleProperty(status);
         }
       })
       .catch(popupAjaxError);
+  }
+
+  function toggleOPAction(helper, status) {
+    const dialog = helper.register.lookup("service:dialog");
+    if (currentUser.siteSettings.topic_op_admin_require_reason_before_action) {
+      showModal("reason-before-topic-op-action-form", {
+        model: {
+          submit() {
+            if (this.reason === "") {
+              dialog.alert(I18n.t("topic_op_admin.reason_modal.alert_no_reason"));
+            } else {
+              this.setProperties({ loading: true });
+              sendToggleOPActionAjax(helper, status, this.reason, this);
+            }
+          },
+        },
+      });
+    } else {
+      sendToggleOPActionAjax(helper, status);
+    }
+  }
+
+  api.attachWidgetAction("topic-OP-admin-menu", "topicOPtoggleClose", function () {
+    toggleOPAction(this, "closed");
   });
   api.attachWidgetAction("topic-OP-admin-menu", "topicOPtoggleVisibility", function () {
-    const topic = this.register.lookup("controller:topic");
-    const dialog = this.register.lookup("service:dialog");
-    ajax("/topic_op_admin/update_topic_status/", {
-      method: "POST",
-      data: {
-        id: this.attrs.topic.id,
-        status: "visible",
-        enabled: !this.attrs.topic.visible,
-      },
-    })
-      .then((res) => {
-        if (!res.success) {
-          dialog.alert(res.message);
-        } else {
-          topic.model.toggleProperty("visible");
-        }
-      })
-      .catch(popupAjaxError);
+    toggleOPAction(this, "visible");
   });
   api.attachWidgetAction("topic-OP-admin-menu", "topicOPtoggleArchived", function () {
-    const topic = this.register.lookup("controller:topic");
-    const dialog = this.register.lookup("service:dialog");
-    ajax("/topic_op_admin/update_topic_status/", {
-      method: "POST",
-      data: {
-        id: this.attrs.topic.id,
-        status: "archived",
-        enabled: !this.attrs.topic.archived,
-      },
-    })
-      .then((res) => {
-        if (!res.success) {
-          dialog.alert(res.message);
-        } else {
-          topic.model.toggleProperty("archived");
-        }
-      })
-      .catch(popupAjaxError);
+    toggleOPAction(this, "archived");
   });
   api.decorateWidget("timeline-controls:after", (helper) => {
     const { fullScreen, topic } = helper.attrs;

@@ -22,3 +22,6 @@ user_autonomy:
   topic_op_admin_logger_topic:
     default: 0
     client: true
+  topic_op_admin_require_reason_before_action:
+    default: true
+    client: true

@@ -19,6 +19,7 @@ class TopicOpAdminController < ::ApplicationController
     topic_id = params[:topic_id].to_i
     enabled = params[:enabled] == "true"
     params[:until] === "" ? params[:until] = nil : params[:until]
+    params[:reason] = nil if params[:reason] == ""
 
     guardian.ensure_can_see_topic!(topic)
 
@@ -74,7 +75,7 @@ class TopicOpAdminController < ::ApplicationController
       enabled,
       TopicOpUserAdminBot.getBot(),
       until: params[:until],
-      message: I18n.t("topic_op_admin.reason_placeholder"),
+      message: params[:reason] || I18n.t("topic_op_admin.reason_placeholder"),
     )
 
     render json:

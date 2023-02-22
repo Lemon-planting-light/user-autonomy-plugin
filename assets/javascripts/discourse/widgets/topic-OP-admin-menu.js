@@ -59,7 +59,7 @@ createWidget("topic-OP-admin-menu-button", {
           className:
             "btn-default popup-menu-button toggle-admin-menu" +
             (attrs.addKeyboardTargetClass ? " keyboard-target-admin-menu" : ""),
-          title: "topic_OP_admin_menu",
+          title: "topic_op_admin.menu_button_title",
           icon: "cog",
           action: "showTopicOPAdminMenu",
           sendActionEvent: true,

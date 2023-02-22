@@ -6,10 +6,17 @@ zh_CN:
     topic_op_admin_enable_topic_log: "开启Bot的日志功能"
     topic_op_admin_logger_topic: "在 topic_op_admin_enable_topic_log 的前提下，bot进行日志的话题id"
     topic_op_admin_manipulatable_groups: "可以打开/关闭某个话题的楼主管理权的群组。（管理员永远可以操作）"
+    topic_op_admin_require_reason_before_action: "楼主自我管理时需要填写理由"
   js:
     topic_op_admin:
+      menu_button_title: "楼主管理菜单"
       enable_topic_op_admin: "楼主管理设置…"
       apply_for_op_admin: "申请自我管理…"
+      default_reason: "由楼主的要求操作"
+      reason_modal:
+        require_reason: "填写原因…"
+        tell_reason: "说明你操作的原因"
+        alert_no_reason: "你还没有填写原因！"
       apply_modal:
         show_composer: "使用编辑器"
         introduce_title: "什么是楼主自我管理？"
