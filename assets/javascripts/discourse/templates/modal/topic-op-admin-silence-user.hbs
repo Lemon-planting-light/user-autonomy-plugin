@@ -26,15 +26,14 @@
         </tr>
         <tr>
           <td>
-            <UserChooser class="topic-op-make-silence-user" @value={{this.new_ban_users}} @options={{hash topicId=model.topic.id}} />
+            <UserChooser
+              class="topic-op-make-silence-user"
+              @value={{this.new_ban_users}}
+              @options={{hash topicId=model.topic.id}}
+            />
           </td>
           <td>
-            <Input
-              class="topic-op-silence-time"
-              maxlength="10"
-              @type="number"
-              @value={{this.silence_time}}
-            />
+            <Input class="topic-op-silence-time" maxlength="10" @type="number" @value={{this.silence_time}} />
           </td>
         </tr>
       </tbody>
