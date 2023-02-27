@@ -372,18 +372,15 @@ class TopicOpAdminController < ::ApplicationController
 
     users = []
 
-    TopicOpbannedUsers
-      .where(topic_id: params[id:])
+    TopicOpBannedUser
+      .where(topic_id: params[:id])
       .each do |record|
         user = User.find_by(id: record.user_id)
         if user.admin? || user.moderator? ||
              user.in_any_groups?(SiteSetting.topic_op_admin_never_be_banned_groups_map)
-          return false
+          next
         end
-        return true if record.banned_seconds.nil?
-        if Time.now <= record.banned_at + record.banned_seconds
-          users.push(BasicUserSerializer.new(user, root: false))
-        end
+        users.push(BasicUserSerializer.new(user, root: false)) if record.banned_seconds.nil? || Time.now <= record.banned_at + record.banned_seconds
       end
 
     render json: { success: true, users: }

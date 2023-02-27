@@ -272,6 +272,15 @@ function init(api) {
   api.attachWidgetAction("topic-OP-admin-menu", "topicOPConvertToPrivateMessage", function () {
     toggleTopicOPAdminButton(this, "private", sendTopicConvertAjax);
   });
+  api.attachWidgetAction("topic-OP-admin-menu", "topicOPBanUsers", function () {
+    showModal("topic-op-admin-silence-user", {
+      model: {
+        submit() {
+          this.send("closeModal");
+        }
+      }
+    });
+  });
   api.decorateWidget("topic-admin-menu-button:after", (helper) => {
     const { openUpwards, topic } = helper.attrs;
     if (currentUser) {

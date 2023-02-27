@@ -171,6 +171,17 @@ export default createWidget("topic-OP-admin-menu", {
       });
     }
 
+    if (this.get("currentUser.staff")) {
+      this.addActionButton({
+        action: "topicOPBanUsers",
+        className: "topic-OP-admin-enable-topic-op-admin",
+        buttonClass: "popup-menu-btn",
+        icon: "shield-alt",
+        fullLabel: "topic_op_admin.enable_topic_op_admin",
+        button_group: "manipulating",
+      });
+    }
+
     if (topic.user_id !== this.get("currentUser.id")) {
       return;
     }
