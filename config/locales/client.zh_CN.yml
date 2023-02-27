@@ -13,6 +13,13 @@ zh_CN:
     topic_op_admin_basic_autoallowing_categories: "这些类别的话题，系统会自动批准楼主自治申请，并授予topic_op_admin_basic_list中的功能"
     topic_op_admin_basic_autoallowing_tags: "这些标签的话题，系统会自动批准楼主自治申请，并授予topic_op_admin_basic_list中的功能"
     topic_op_admin_basic_list: "系统自动批准楼主自治申请时的topic_op_admin_basic_list"
+    topic_op_admin_tags_autogrant_can_close: "这些标签的话题，系统会自动批准楼主自治申请，授权楼主关闭话题"
+    topic_op_admin_tags_autogrant_can_archive: "这些标签的话题，系统会自动批准楼主自治申请，授权楼主对话题归档"
+    topic_op_admin_tags_autogrant_can_visible: "这些标签的话题，系统会自动批准楼主自治申请，授权楼主隐藏话题"
+    topic_op_admin_tags_autogrant_can_slow_mode: "这些标签的话题，系统会自动批准楼主自治申请，授权楼主慢速模式"
+    topic_op_admin_tags_autogrant_can_set_timer: "这些标签的话题，系统会自动批准楼主自治申请，授权楼主设置计时器"
+    topic_op_admin_tags_autogrant_can_silence: "这些标签的话题，系统会自动批准楼主自治申请，授权楼主禁言别的用户"
+    topic_op_admin_tags_autogrant_can_make_PM: "这些标签的话题，系统会自动批准楼主自治申请，授权楼主转化为私信"
   js:
     topic_op_admin:
       menu_button_title: "楼主管理菜单"

@@ -3,9 +3,9 @@
     <p>
       在该楼内被禁言的用户
     </p>
-    
+
   </div>
-  <hr>
+  <hr />
   <div class="control-group">
     <p>
       {{i18n "topic_op_admin.reason_modal.tell_reason"}}
@@ -16,12 +16,7 @@
 </DModalBody>
 
 <div class="modal-footer">
-  <DButton
-    @class="btn-primary"
-    @label="ok_value"
-    @action={{action model.submit}}
-    @disabled={{this.loading}}
-  />
+  <DButton @class="btn-primary" @label="ok_value" @action={{action model.submit}} @disabled={{this.loading}} />
   <DModalCancel @close={{route-action "closeModal"}} />
   <ConditionalLoadingSpinner @size="small" @condition={{this.loading}} />
 </div>

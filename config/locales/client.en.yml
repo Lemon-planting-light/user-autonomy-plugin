@@ -13,6 +13,13 @@ en:
     topic_op_admin_basic_autoallowing_categories: "For these categories of topics, the system will automatically approve the autonomy application of the OP and grant topic_op_admin_basic_list"
     topic_op_admin_basic_autoallowing_tags: "For these tags of topics, the system will automatically approve the autonomy application of the OP and grant topic_op_admin_basic_list"
     topic_op_admin_basic_list: "functions in topic_op_admin_basic_list"
+    topic_op_admin_tags_autogrant_can_close: "Topics in these tags, the system will automatically grant can_close"
+    topic_op_admin_tags_autogrant_can_archive: "Topics in these tags, the system will automatically grant can_archive"
+    topic_op_admin_tags_autogrant_can_visible: "Topics in these tags, the system will automatically grant can_visible"
+    topic_op_admin_tags_autogrant_can_slow_mode: "Topics in these tags, the system will automatically grant can_slow_mode"
+    topic_op_admin_tags_autogrant_can_set_timer: "Topics in these tags, the system will automatically grant can_set_timer"
+    topic_op_admin_tags_autogrant_can_silence: "Topics in these tags, the system will automatically grant can_silence"
+    topic_op_admin_tags_autogrant_can_make_PM: "Topics in these tags, the system will automatically grant can_make_PM"
   js:
     topic_op_admin:
       menu_button_title: "OP admin menu"
