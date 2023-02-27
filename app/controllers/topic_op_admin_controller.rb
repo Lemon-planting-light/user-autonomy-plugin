@@ -153,13 +153,15 @@ class TopicOpAdminController < ::ApplicationController
     ns = {
       can_close: params[:new_status]["close"],
       can_archive: params[:new_status]["archive"],
-      can_make_PM: params[:new_status]["make_PM"],
       can_visible: params[:new_status]["visible"],
       can_slow_mode: params[:new_status]["slow_mode"],
       can_set_timer: params[:new_status]["set_timer"],
-      can_silence: params[:new_status]["silence"],
       can_fold_posts: params[:new_status]["fold_posts"],
     }
+    if guardian.user.admin? || guardian.user.moderator?
+      ns[:can_make_PM] = params[:new_status]["make_PM"]
+      ns[:can_silence] = params[:new_status]["silence"]
+    end
 
     TopicOpUserAdminBot.botLogger(
       "@#{guardian.user.username} " +

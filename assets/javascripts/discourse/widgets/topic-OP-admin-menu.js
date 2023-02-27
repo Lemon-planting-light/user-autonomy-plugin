@@ -185,6 +185,9 @@ export default createWidget("topic-OP-admin-menu", {
     if (topic.user_id !== this.get("currentUser.id")) {
       return;
     }
+    if (!this.get("currentUser.can_create_topic")) {
+      return;
+    }
 
     if (!this.get("currentUser.can_manipulate_topic_op_adminable")) {
       this.addActionButton({
