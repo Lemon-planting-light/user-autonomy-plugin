@@ -273,13 +273,69 @@ function init(api) {
     toggleTopicOPAdminButton(this, "private", sendTopicConvertAjax);
   });
   api.attachWidgetAction("topic-OP-admin-menu", "topicOPBanUsers", function () {
-    showModal("topic-op-admin-silence-user", {
+    const dialog = this.register.lookup("service:dialog");
+    const topic = this.attrs.topic;
+    const modal = showModal("topic-op-admin-silence-user", {
       model: {
         submit() {
-          this.send("closeModal");
-        }
-      }
+          if (this.new_ban_users.length === 0 && this.new_unmute_users.length === 0) {
+            this.send("closeModal");
+            return;
+          }
+          let seconds;
+          if (this.silence_time !== "") {
+            seconds = Number(this.silence_time) * 60;
+          } else {
+            seconds = null;
+          }
+          if (this.reason === "") {
+            dialog.alert(I18n.t("topic_op_admin.reason_modal.alert_no_reason"));
+          } else {
+            if (this.submitting) {
+              return;
+            }
+            this.setProperties({ submitting: true });
+            ajax("/topic_op_admin/update_topic_op_banned_users", {
+              method: "PUT",
+              data: {
+                id: topic.id,
+                new_silence_users: this.new_ban_users,
+                seconds,
+                new_unmute_users: this.new_unmute_users,
+                reason: this.reason,
+              },
+            })
+              .then((res) => {
+                modal.setProperties({ submitting: false });
+                modal.send("closeModal");
+                if (!res.success) {
+                  dialog.alert(res.message);
+                }
+              })
+              .catch(popupAjaxError);
+          }
+        },
+      },
     });
+    modal.setProperties({
+      submitting: false,
+      new_ban_users: [],
+      new_unmute_users: [],
+      loading: true,
+    });
+    ajax("/topic_op_admin/get_topic_op_banned_users", {
+      method: "GET",
+      data: {
+        id: this.attrs.topic.id,
+      },
+    })
+      .then((res) => {
+        modal.setProperties({
+          loading: false,
+          users: res.users,
+        });
+      })
+      .catch(popupAjaxError);
   });
   api.decorateWidget("topic-admin-menu-button:after", (helper) => {
     const { openUpwards, topic } = helper.attrs;

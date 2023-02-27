@@ -4,19 +4,25 @@ en:
       subject_template: "Post has been hidden"
       text_body_template: "Hello, this is a private message automatically sent by the community to inform you that your post at <%{base_url}%{url}> has been hidden because the OP has banned you. \n\nContinuing to reply may be considered harassment and result in you being silenced from the entire site by moderators. \n\nIf you have objections, please contact our staff."
   topic_op_admin:
-    no_perm: "You do not have permission tfor this operation"
+    no_perm: "You do not have permission for this operation"
+    too_many: "Too many requests"
+    succeed_partial: "Sorry, you don't have permission for some of requests"
     get_request: "We have received your request, please be patient."
     autoallowing_request: "Your request have been approved. Please check your topic-OP-admin menu."
     apply_title: "Application to set # as OP self-management"
     reason_placeholder: "Operated by the OP's request"
     bot_send_template:
       ban:
+        text: "Silenced"
+        forever: "Forever"
         failed: "Failed: You can't to silence this user."
+        time: "Time"
         success: 
           forever: "Success: You silenced"
           temp: "Success: You silenced"
           min: "minutes"
       unmute:
+        text: "Unmuted"
         failed: "Failed: You can't to silence this user."
         success: "Success: You unbanned"
     log_template:
@@ -39,6 +45,7 @@ en:
           enable: "convert topic # to PM"
           disable: "convert topic # to public topic"
         set_timer: "changed topic timer for topic #\n"
+        silence: "silenced/unmuted in topic #"
       without_perm:
         set_admin_status: "Revised Topic # OP Admin Mode without authorization\n"
         closed: 
@@ -57,6 +64,7 @@ en:
           enable: "convert topic # to PM without authorization"
           disable: "convert topic # to public topic without authorization"
         set_timer: "changed topic timer for topic # without authorization\n"
+        silence: "silenced/unmuted in topic # without authorization"
         otherwise: "sent an unknown request to topic # . Here are the details:\n"
 
 

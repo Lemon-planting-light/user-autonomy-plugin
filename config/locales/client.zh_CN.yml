@@ -24,8 +24,18 @@ zh_CN:
     topic_op_admin:
       menu_button_title: "楼主管理菜单"
       enable_topic_op_admin: "楼主管理设置…"
+      silence_user: "禁言用户…"
       apply_for_op_admin: "申请自我管理…"
       default_reason: "由楼主的要求操作"
+      silence_modal:
+        banned_users: "在该楼内被禁言的用户"
+        banning_users: "禁言用户……"
+        unmute: "解除禁言"
+        recover: "撤销"
+        be_ban_user: "被禁言用户"
+        be_ban_at: "被禁言时间"
+        be_ban_time: "禁言时长（分钟）"
+        forever: "永久"
       reason_modal:
         require_reason: "填写原因…"
         tell_reason: "说明你操作的原因"

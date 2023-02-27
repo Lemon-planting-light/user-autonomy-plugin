@@ -24,8 +24,18 @@ en:
     topic_op_admin:
       menu_button_title: "OP admin menu"
       enable_topic_op_admin: "OP-admin Settings..."
+      silence_user: "Silence user..."
       apply_for_op_admin: "Apply for autonomy..."
       default_reason: "Operated by the OP's request"
+      silence_modal:
+        banned_users: "Users silenced"
+        banning_users: "Silencing user..."
+        unmute: "Unmute"
+        recover: "Recover"
+        be_ban_user: "User"
+        be_ban_at: "Silenced At"
+        be_ban_time: "Time (minutes)"
+        forever: "Forever"
       reason_modal:
         require_reason: "Fill in the reason..."
         tell_reason: "Explain the reason of your operation"

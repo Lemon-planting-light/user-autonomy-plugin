@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# frozen_string_literal: false
 
 require_relative "../lib/bot.rb"
 
@@ -380,10 +380,109 @@ class TopicOpAdminController < ::ApplicationController
              user.in_any_groups?(SiteSetting.topic_op_admin_never_be_banned_groups_map)
           next
         end
-        users.push(BasicUserSerializer.new(user, root: false)) if record.banned_seconds.nil? || Time.now <= record.banned_at + record.banned_seconds
+        if record.banned_seconds.nil? || Time.now <= record.banned_at + record.banned_seconds
+          u = JSON.parse(BasicUserSerializer.new(user, root: false).to_json)
+          u["banned_at"] = record.banned_at
+          u["banned_seconds"] = record.banned_seconds
+          users.push(u)
+        end
       end
 
     render json: { success: true, users: }
+  end
+
+  def update_topic_op_banned_users
+    params.require(:id)
+    params.permit(:new_silence_users)
+    params.permit(:new_unmute_users)
+    params.require(:reason)
+
+    params[:new_silence_users] ||= []
+    params[:new_unmute_users] ||= []
+
+    seconds = params[:seconds].to_i
+    seconds = nil if seconds == 0
+
+    # We don't want any one to silence too many users
+    if (params[:new_silence_users].length > 100)
+      return render_fail "topic_op_admin.too_many", status: 403
+    end
+
+    topic = BotLoggingTopic.find_by(id: params[:id])
+
+    guardian.ensure_can_see_topic!(topic)
+
+    unless guardian.can_edit_topic_banned_user_list?(topic)
+      TopicOpUserAdminBot.botLogger(
+        "@#{guardian.user.username} " +
+          I18n.t("topic_op_admin.log_template.without_perm.silence").gsub("#", topic.url) +
+          "\n```\n#{params.to_yaml}\n```",
+      )
+      return render_fail "topic_op_admin.no_perm", status: 403
+    end
+
+    TopicOpUserAdminBot.botLogger(
+      "@#{guardian.user.username} " +
+        I18n.t("topic_op_admin.log_template.with_perm.silence").gsub("#", topic.url) +
+        "\n```\n#{params.to_yaml}\n```",
+    )
+
+    unmute_names = ""
+    mute_names = ""
+
+    params[:new_unmute_users].each do |id|
+      target_user = User.find_by(id:)
+      unmute_names << "@#{target_user.username}, "
+      TopicOpBannedUser.cancelBanUser(topic.id, id)
+    end
+
+    failed = false
+
+    params[:new_silence_users].each do |username|
+      target_user = User.find_by(username:)
+
+      if target_user.nil? || target_user.admin? || target_user.moderator?
+        failed = true
+      else
+        mute_names << "@#{username}, "
+        TopicOpBannedUser.banUser(topic.id, target_user.id, seconds)
+      end
+    end
+
+    silence_time =
+      (
+        if seconds.nil?
+          I18n.t("topic_op_admin.bot_send_template.ban.forever")
+        else
+          "#{seconds.to_i / 60} " + I18n.t("topic_op_admin.bot_send_template.ban.success.min")
+        end
+      )
+
+    unmute_line = ""
+    unmute_line =
+      I18n.t("topic_op_admin.bot_send_template.unmute.text") + ": " + unmute_names +
+        "\n" if unmute_names != ""
+
+    mute_line = ""
+    mute_line =
+      I18n.t("topic_op_admin.bot_send_template.ban.text") + ": " + mute_names + "\n" +
+        I18n.t("topic_op_admin.bot_send_template.ban.time") + ": " + silence_time +
+        "\n" if mute_names != ""
+
+    if !(mute_line == "" && unmute_line == "")
+      TopicOpUserAdminBot.botSendPost(
+        topic.id,
+        "@#{guardian.user.username}\n\n" + unmute_line + mute_line +
+          I18n.t("topic_op_admin.log_template.reason") + " #{params[:reason]}",
+        skip_validations: true,
+      )
+    end
+
+    if failed
+      return render_fail "topic_op_admin.successed_partial", status: 403
+    else
+      render json: { success: true }
+    end
   end
 
   def render_topic_changes(dest_topic)

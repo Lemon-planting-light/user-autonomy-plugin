@@ -1,11 +1,48 @@
 <DModalBody @title="topic_op_admin.silence_user">
-  <div class="control-group">
-    <p>
-      在该楼内被禁言的用户
-    </p>
+  <ConditionalLoadingSpinner @size="large" @condition={{this.loading}}>
+    <div class="topic-OP-banned-users-container control-group">
+      {{#if this.users}}
+        <p>
+          {{i18n "topic_op_admin.silence_modal.banned_users"}}
+        </p>
+        {{mount-widget widget="topic-OP-admin-user-ban" args=this}}
+      {{/if}}
+    </div>
+  </ConditionalLoadingSpinner>
 
+  <p>
+    {{i18n "topic_op_admin.silence_modal.banning_users"}}
+  </p>
+  <div class="input-group">
+    <table class="topic-OP-admin-banned-users">
+      <tbody>
+        <tr>
+          <td>
+            {{i18n "topic_op_admin.silence_modal.be_ban_user"}}
+          </td>
+          <td>
+            {{i18n "topic_op_admin.silence_modal.be_ban_time"}}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <UserChooser @value={{this.new_ban_users}} />
+          </td>
+          <td>
+            <Input
+              class="topic-op-silence-time"
+              maxlength="10"
+              @type="number"
+              @value={{this.silence_time}}
+              width="30px"
+              padding="0"
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <hr />
+
   <div class="control-group">
     <p>
       {{i18n "topic_op_admin.reason_modal.tell_reason"}}
@@ -16,7 +53,7 @@
 </DModalBody>
 
 <div class="modal-footer">
-  <DButton @class="btn-primary" @label="ok_value" @action={{action model.submit}} @disabled={{this.loading}} />
+  <DButton @class="btn-primary" @label="ok_value" @action={{action model.submit}} @disabled={{this.submitting}} />
   <DModalCancel @close={{route-action "closeModal"}} />
-  <ConditionalLoadingSpinner @size="small" @condition={{this.loading}} />
+  <ConditionalLoadingSpinner @size="small" @condition={{this.submitting}} />
 </div>

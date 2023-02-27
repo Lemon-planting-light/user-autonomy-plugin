@@ -1,29 +1,24 @@
 # frozen_string_literal: true
 
 module TopicOpUserAdminBot
-  def TopicOpUserAdminBot.create_bot(id, admin: false, username: nil)
-    User.new.tap do |user|
-      user.id = id
-      user.email = "user#{SecureRandom.hex}@localhost#{SecureRandom.hex}.fake"
-      user.username = username || "user#{SecureRandom.hex}"
-      user.password = SecureRandom.hex
-      user.username_lower = user.username.downcase
-      user.active = true
-      user.approved = true
-      user.save!
-      user.grant_admin! if admin
-      user.change_trust_level!(TrustLevel[4])
-      user.activate
-    end
-  end
+  # def TopicOpUserAdminBot.create_bot(id, admin: false, username: nil)
+  #   User.new.tap do |user|
+  #     user.id = id
+  #     user.email = "user#{SecureRandom.hex}@localhost#{SecureRandom.hex}.fake"
+  #     user.username = username || "user#{SecureRandom.hex}"
+  #     user.password = SecureRandom.hex
+  #     user.username_lower = user.username.downcase
+  #     user.active = true
+  #     user.approved = true
+  #     user.save!
+  #     user.grant_admin! if admin
+  #     user.change_trust_level!(TrustLevel[4])
+  #     user.activate
+  #   end
+  # end
 
   def TopicOpUserAdminBot.getBot()
-    User.find_by(id: SiteSetting.topic_op_admin_bot_user_id?) ||
-      create_bot(
-        SiteSetting.topic_op_admin_bot_user_id?,
-        admin: false,
-        username: "UserAssistantBot",
-      )
+    User.find_by(id: SiteSetting.topic_op_admin_bot_user_id?) || Discourse.system_user
   end
 
   def TopicOpUserAdminBot.botLogger(rawText)
