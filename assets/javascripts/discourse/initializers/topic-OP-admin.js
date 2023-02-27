@@ -277,6 +277,7 @@ function init(api) {
     const topic = this.attrs.topic;
     const modal = showModal("topic-op-admin-silence-user", {
       model: {
+        topic,
         submit() {
           if (this.new_ban_users.length === 0 && this.new_unmute_users.length === 0) {
             this.send("closeModal");

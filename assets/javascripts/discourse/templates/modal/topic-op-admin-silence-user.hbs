@@ -26,7 +26,7 @@
         </tr>
         <tr>
           <td>
-            <UserChooser @value={{this.new_ban_users}} />
+            <UserChooser @value={{this.new_ban_users}} @options={{hash topicId=model.topic.id}} />
           </td>
           <td>
             <Input
