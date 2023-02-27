@@ -198,21 +198,31 @@ class TopicOpAdminController < ::ApplicationController
           SiteSetting.topic_op_admin_manipulatable_groups_map.map { |id| Group.find_by(id:).name },
         skip_validations: true,
       )
-
-    if SiteSetting
-         .topic_op_admin_basic_autoallowing_tags
-         .to_s
-         .split("|")
-         .intersect?(topic.tags.map(&:name)) ||
-         SiteSetting
-           .topic_op_admin_basic_autoallowing_categories
-           .to_s
-           .split("|")
-           .map(&:to_i)
-           .include?(topic.category&.id) && topic.topic_op_admin_status?.is_default
+    
+    if topic.topic_op_admin_status?.is_default
+      ns = {}
       ds = {}
-      SiteSetting.topic_op_admin_basic_list.split("|").each { |i| ds[i] = true }
 
+      if SiteSetting
+          .topic_op_admin_basic_autoallowing_tags
+          .to_s
+          .split("|")
+          .intersect?(topic.tags.map(&:name)) ||
+          SiteSetting
+            .topic_op_admin_basic_autoallowing_categories
+            .to_s
+            .split("|")
+            .map(&:to_i)
+            .include?(topic.category&.id)
+        SiteSetting.topic_op_admin_basic_list.split("|").each { |i| ds[i] = true }
+      end
+
+      ["can_close", "can_visible", "can_make_PM", "can_archive", "can_set_timer", "can_silence", "can_slow_mode"].each do |status|
+        if SiteSetting.method("topic_op_admin_tags_autogrant_#{status}").call().to_s.split("|").intersect?(topic.tags.map(&:name))
+          ds[status] = true
+        end
+      end
+      
       ns = {
         can_close: ds["can_close"] || false,
         can_archive: ds["can_archive"] || false,
@@ -233,7 +243,6 @@ class TopicOpAdminController < ::ApplicationController
 
       TopicOpAdminStatus.updateRecord(topic.id, **ns)
     end
-
     render json: success_json.merge!(message: I18n.t("topic_op_admin.get_request"))
   end
 
@@ -343,6 +352,24 @@ class TopicOpAdminController < ::ApplicationController
     response.status = kwargs[:status] || 400
     render json: { success: false, message: I18n.t(*args, **kwargs.except(:status)) }
     nil
+  end
+
+  def get_topic_op_banned_users
+    params.require(:id)
+
+    users = []
+
+    TopicOpbannedUsers.where(topic_id: params[id:]).each do |record|
+      user = User.find_by(id: record.user_id)
+      if user.admin? || user.moderator? ||
+            user.in_any_groups?(SiteSetting.topic_op_admin_never_be_banned_groups_map)
+        return false
+      end
+      return true if record.banned_seconds.nil?
+      users.push(BasicUserSerializer.new(user, root: false)) if Time.now <= record.banned_at + record.banned_seconds
+    end
+  
+    render json: { success: true, users: }
   end
 
   def render_topic_changes(dest_topic)

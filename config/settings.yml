@@ -52,6 +52,48 @@ user_autonomy:
       - can_set_timer
       - can_silence
       - can_fold_posts
+  topic_op_admin_tags_autogrant_can_close:
+    client: false
+    type: tag_list
+    list_type: compact
+    default: ""
+    allow_any: false
+  topic_op_admin_tags_autogrant_can_archive:
+    client: false
+    type: tag_list
+    list_type: compact
+    default: ""
+    allow_any: false
+  topic_op_admin_tags_autogrant_can_visible:
+    client: false
+    type: tag_list
+    list_type: compact
+    default: ""
+    allow_any: false
+  topic_op_admin_tags_autogrant_can_slow_mode:
+    client: false
+    type: tag_list
+    list_type: compact
+    default: ""
+    allow_any: false
+  topic_op_admin_tags_autogrant_can_set_timer:
+    client: false
+    type: tag_list
+    list_type: compact
+    default: ""
+    allow_any: false
+  topic_op_admin_tags_autogrant_can_silence:
+    client: false
+    type: tag_list
+    list_type: compact
+    default: ""
+    allow_any: false
+  topic_op_admin_tags_autogrant_can_make_PM:
+    client: false
+    type: tag_list
+    list_type: compact
+    default: ""
+    allow_any: false
   topic_op_admin_require_reason_before_action:
     default: true
     client: true
