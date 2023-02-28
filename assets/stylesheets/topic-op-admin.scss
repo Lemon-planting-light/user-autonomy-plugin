@@ -30,5 +30,29 @@ table.topic-OP-admin-banned-users {
   overflow-y: auto;
 }
 .topic-op-silence-time {
+  width: 100% !important;
   margin-bottom: 0 !important;
+}
+.topic-op-make-silence-user {
+  width: 100% !important;
+}
+table.topic-OP-admin-banned-users.new-ban td {
+  width: 60%;
+}
+.mobile-view {
+  table.topic-OP-admin-banned-users td.operation {
+    padding: 0;
+  }
+  .topic-OP-admin-banned-users.new-ban .select-kit-body {
+    width: 350px !important;
+  }
+  .topic-OP-admin-unmute-button {
+    padding: .5em;
+    .d-icon {
+      margin-right: 0;
+    }
+    .d-button-label {
+      display: none;
+    }
+  }
 }

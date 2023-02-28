@@ -14,7 +14,7 @@
     {{i18n "topic_op_admin.silence_modal.banning_users"}}
   </p>
   <div class="input-group">
-    <table class="topic-OP-admin-banned-users">
+    <table class="topic-OP-admin-banned-users new-ban">
       <tbody>
         <tr>
           <td>
@@ -26,7 +26,7 @@
         </tr>
         <tr>
           <td>
-            <UserChooser @value={{this.new_ban_users}} @options={{hash topicId=model.topic.id}} />
+            <UserChooser class="topic-op-make-silence-user" @value={{this.new_ban_users}} @options={{hash topicId=model.topic.id}} />
           </td>
           <td>
             <Input
@@ -34,8 +34,6 @@
               maxlength="10"
               @type="number"
               @value={{this.silence_time}}
-              width="30px"
-              padding="0"
             />
           </td>
         </tr>

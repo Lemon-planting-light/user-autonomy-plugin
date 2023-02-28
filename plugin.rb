@@ -4,7 +4,7 @@
 # about: Give topic's op some admin function
 # version: 0.0.1
 # authors: Lhc_fl
-# url: TODO
+# url: https://github.com/Lhc_fl
 # required_version: 3.0.0
 
 enabled_site_setting :user_autonomy_plugin_enabled
