@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# name: User-Autonomy-Plugin
+# name: user-autonomy-plugin
 # about: Give topic's op some admin function
 # version: 0.1.1
 # authors: Lhc_fl
