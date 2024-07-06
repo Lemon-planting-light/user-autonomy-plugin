@@ -9,6 +9,10 @@
 
 enabled_site_setting :user_autonomy_plugin_enabled
 
+module ::UserAutonomyModule
+  PLUGIN_NAME = "user-autonomy-plugin"
+end
+
 register_asset "stylesheets/topic-op-admin.scss"
 if respond_to?(:register_svg_icon)
   register_svg_icon "cog"
@@ -17,16 +21,20 @@ if respond_to?(:register_svg_icon)
 end
 
 require_relative "app/lib/bot.rb"
+require_relative "lib/user_autonomy_module/engine.rb"
 
 after_initialize do
   %w[
     app/controllers/topic_op_admin_controller.rb
     app/lib/bot.rb
     app/models/topic_op_admin_status.rb
+    app/serializers/topic_op_admin_status_serializer.rb
     app/models/bot_logging_topic.rb
     app/lib/topic_op_admin_handle_new_posts.rb
     app/models/topic_op_banned_user.rb
-  ].each { |f| load File.expand_path("../#{f}", __FILE__) }
+  ].each do |f|
+    require_relative File.expand_path("../#{f}", __FILE__)
+  end
 
   Discourse::Application.routes.append do
     post "/topic_op_admin/update_topic_status" => "topic_op_admin#update_topic_status"
@@ -55,7 +63,9 @@ after_initialize do
   end
 
   add_to_class(:topic, :topic_op_admin_status?) { TopicOpAdminStatus.getRecord?(id) }
-  add_to_serializer(:topic_view, :topic_op_admin_status) { topic.topic_op_admin_status? }
+  add_to_serializer(:topic_view, :topic_op_admin_status) do
+    TopicOpAdminStatusSerializer.new(topic.topic_op_admin_status?).as_json[:topic_op_admin_status]
+  end
 
   add_to_class(:guardian, :can_close_topic_as_op?) do |topic|
     return false if user.silenced_till
