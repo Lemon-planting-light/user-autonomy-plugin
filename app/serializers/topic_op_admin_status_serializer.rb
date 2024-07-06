@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TopicOpAdminStatusSerializer < ApplicationSerializer
   attributes :can_close,
              :can_archive,

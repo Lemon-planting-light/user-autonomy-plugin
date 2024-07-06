@@ -5,9 +5,10 @@
   "author": "Lhc_fl",
   "license": "MIT",
   "devDependencies": {
-    "@prettier/plugin-ruby": "^3.2.2",
-    "eslint-config-discourse": "^3.1.0",
-    "prettier": "^2.8.4"
+    "@discourse/lint-configs": "1.3.9",
+    "ember-template-lint": "6.0.0",
+    "eslint": "8.57.0",
+    "prettier": "2.8.8"
   },
   "scripts": {
     "lint:stree": "bundle exec stree check Gemfile $(git ls-files '*.rb') $(git ls-files '*.rake')",

@@ -33,7 +33,6 @@ GEM
     ruby-progressbar (1.11.0)
     syntax_tree (6.0.0)
       prettier_print (>= 1.2.0)
-    syntax_tree-disable_ternary (1.0.0)
     unicode-display_width (2.4.2)
 
 PLATFORMS
@@ -47,7 +46,6 @@ PLATFORMS
 DEPENDENCIES
   rubocop-discourse
   syntax_tree
-  syntax_tree-disable_ternary
 
 BUNDLED WITH
    2.3.10
