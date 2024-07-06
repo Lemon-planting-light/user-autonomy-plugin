@@ -32,9 +32,7 @@ after_initialize do
     app/models/bot_logging_topic.rb
     app/lib/topic_op_admin_handle_new_posts.rb
     app/models/topic_op_banned_user.rb
-  ].each do |f|
-    require_relative File.expand_path("../#{f}", __FILE__)
-  end
+  ].each { |f| require_relative File.expand_path("../#{f}", __FILE__) }
 
   Discourse::Application.routes.append do
     post "/topic_op_admin/update_topic_status" => "topic_op_admin#update_topic_status"

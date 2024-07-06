@@ -1,9 +1,7 @@
-import { withPluginApi } from "discourse/lib/plugin-api";
-import { popupAjaxError } from "discourse/lib/ajax-error";
 import { ajax } from "discourse/lib/ajax";
+import { withPluginApi } from "discourse/lib/plugin-api";
 import Topic from "discourse/models/topic";
 import TopicTimer from "discourse/models/topic-timer";
-import I18n from "I18n";
 import TopicOpAdminMenuButton from "../components/topic-op-admin-menu-button";
 
 const pluginId = "topic-OP-admin";
@@ -29,7 +27,14 @@ function init(api) {
     },
   });
   TopicTimer.reopenClass({
-    update(topicId, time, basedOnLastPost, statusType, categoryId, durationMinutes) {
+    update(
+      topicId,
+      time,
+      basedOnLastPost,
+      statusType,
+      categoryId,
+      durationMinutes
+    ) {
       let data = {
         time,
         status_type: statusType,
@@ -63,7 +68,10 @@ function init(api) {
 
   api.renderInOutlet("timeline-controls-before", TopicOpAdminMenuButton);
   api.renderInOutlet("before-topic-progress", TopicOpAdminMenuButton);
-  api.renderInOutlet("topic-footer-main-buttons-before-create", TopicOpAdminMenuButton);
+  api.renderInOutlet(
+    "topic-footer-main-buttons-before-create",
+    TopicOpAdminMenuButton
+  );
 }
 
 export default {
