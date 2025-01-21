@@ -67,9 +67,10 @@ export default class RequestTopicOpAdminForm extends Component {
   showComposer() {
     this.composer.openNewMessage({
       recipients: this.currentUser.op_admin_form_recipients.join(","),
-      title: i18n(
-        "topic_op_admin.apply_modal.apply_template_title"
-      ).replaceAll("#", this.topic.title),
+      title: i18n("topic_op_admin.apply_modal.apply_template_title").replaceAll(
+        "#",
+        this.topic.title
+      ),
       body: `${this.textTemplate}${this.reason}`,
       hasGroups: true,
     });
