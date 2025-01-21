@@ -11,8 +11,8 @@ enabled_site_setting :user_autonomy_plugin_enabled
 
 register_asset "stylesheets/topic-op-admin.scss"
 if respond_to?(:register_svg_icon)
-  register_svg_icon "cog"
-  register_svg_icon "cogs"
+  register_svg_icon "gear"
+  register_svg_icon "gears"
   register_svg_icon "envelope-open-text"
 end
 

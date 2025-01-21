@@ -27,3 +27,14 @@ class TopicOpBannedUser < ActiveRecord::Base
     self.destroy_by(topic_id:, user_id:) if self.exists?(topic_id:, user_id:)
   end
 end
+
+# == Schema Information
+#
+# Table name: topic_op_banned_user
+#
+#  id             :bigint           not null, primary key
+#  topic_id       :integer
+#  user_id        :integer
+#  banned_at      :datetime         not null
+#  banned_seconds :integer
+#

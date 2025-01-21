@@ -78,7 +78,7 @@ export default {
   name: pluginId,
 
   initialize(container) {
-    if (!container.lookup("site-settings:main").topic_op_admin_enabled) {
+    if (!container.lookup("service:site-settings").topic_op_admin_enabled) {
       return;
     }
     withPluginApi("1.8.0", init);

@@ -6,7 +6,7 @@ import EditSlowModeModal from "discourse/components/modal/edit-slow-mode";
 import EditTopicTimerModal from "discourse/components/modal/edit-topic-timer";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 import RequestTopicOpAdminForm from "./modal/request-op-admin-form";
 import SetTopicOpAdminStatusModal from "./modal/set-topic-op-admin-status";
 import TellReasonForm from "./modal/tell-reason-form";
@@ -66,7 +66,7 @@ export default class TopicOpAdminMenuButton extends Component {
       res.push({
         action: this.showSetTopicOpAdminStatus,
         class: "topic-OP-admin-enable-topic-op-admin",
-        icon: "cogs",
+        icon: "gears",
         label: "topic_op_admin.enable_topic_op_admin",
         group: "manipulating",
       });
@@ -212,7 +212,7 @@ export default class TopicOpAdminMenuButton extends Component {
    */
   _send_ajax(url, method, data, reason) {
     data.id = this.topic.id;
-    reason ||= I18n.t("topic_op_admin.default_reason");
+    reason ||= i18n("topic_op_admin.default_reason");
     data.reason = reason;
     return ajax(url, {
       method,
@@ -268,7 +268,7 @@ export default class TopicOpAdminMenuButton extends Component {
           submit: async (modal) => {
             if (modal.reason === "") {
               this.dialog.alert(
-                I18n.t("topic_op_admin.reason_modal.alert_no_reason")
+                i18n("topic_op_admin.reason_modal.alert_no_reason")
               );
             } else {
               await fn(name, modal.reason);

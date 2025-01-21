@@ -4,8 +4,7 @@ import { fn, hash } from "@ember/helper";
 import { action } from "@ember/object";
 import DButton from "discourse/components/d-button";
 import avatar from "discourse/helpers/bound-avatar-template";
-import i18n from "discourse-common/helpers/i18n";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 
 export default class TopicOpAdminBannedUsers extends Component {
   @tracked unmute_user_ids = new Map();
@@ -17,7 +16,7 @@ export default class TopicOpAdminBannedUsers extends Component {
       round: this.updated,
       banned_time: u.banned_seconds
         ? String(u.banned_seconds / 60)
-        : I18n.t("topic_op_admin.silence_modal.forever"),
+        : i18n("topic_op_admin.silence_modal.forever"),
       banned_at: new Date(u.banned_at).toLocaleString(),
       in_unmute_user_ids: this.unmute_user_ids.has(u.id)
     }));

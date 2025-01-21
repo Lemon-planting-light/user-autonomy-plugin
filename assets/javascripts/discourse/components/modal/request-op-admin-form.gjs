@@ -9,8 +9,7 @@ import DModal from "discourse/components/d-modal";
 import DModalCancel from "discourse/components/d-modal-cancel";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import i18n from "discourse-common/helpers/i18n";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 
 export default class RequestTopicOpAdminForm extends Component {
   @service dialog;
@@ -25,8 +24,8 @@ export default class RequestTopicOpAdminForm extends Component {
   }
 
   get textTemplate() {
-    return I18n.t("topic_op_admin.apply_modal.apply_template").replaceAll("#", `[${this.topic.title}](${this.topic.url})`) +
-      `\n${I18n.t("topic_op_admin.apply_modal.apply_reason")}\n`;
+    return i18n("topic_op_admin.apply_modal.apply_template").replaceAll("#", `[${this.topic.title}](${this.topic.url})`) +
+      `\n${i18n("topic_op_admin.apply_modal.apply_reason")}\n`;
   }
 
 
@@ -65,7 +64,7 @@ export default class RequestTopicOpAdminForm extends Component {
   showComposer() {
     this.composer.openNewMessage({
       recipients: this.currentUser.op_admin_form_recipients.join(","),
-      title: I18n.t("topic_op_admin.apply_modal.apply_template_title").replaceAll("#", this.topic.title),
+      title: i18n("topic_op_admin.apply_modal.apply_template_title").replaceAll("#", this.topic.title),
       body: `${this.textTemplate}${this.reason}`,
       hasGroups: true,
     });
