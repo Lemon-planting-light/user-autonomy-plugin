@@ -29,3 +29,14 @@ module UserAutonomyModule
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: topic_op_banned_user
+#
+#  id             :bigint           not null, primary key
+#  topic_id       :integer
+#  user_id        :integer
+#  banned_at      :datetime         not null
+#  banned_seconds :integer
+#

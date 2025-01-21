@@ -19,3 +19,19 @@ module UserAutonomyModule
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: topic_op_admin_status
+#
+#  id             :bigint           not null, primary key
+#  can_close      :boolean          default(FALSE)
+#  can_archive    :boolean          default(FALSE)
+#  can_make_PM    :boolean          default(FALSE)
+#  can_visible    :boolean          default(FALSE)
+#  can_slow_mode  :boolean          default(FALSE)
+#  can_set_timer  :boolean          default(FALSE)
+#  can_silence    :boolean          default(FALSE)
+#  can_fold_posts :boolean          default(FALSE)
+#  is_default     :boolean          default(TRUE), not null
+#

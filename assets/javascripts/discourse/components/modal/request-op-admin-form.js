@@ -4,7 +4,7 @@ import { action } from "@ember/object";
 import { service } from "@ember/service";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
-import I18n from "I18n";
+import { i18n } from "discourse-i18n";
 // import { on } from "@ember/modifier";
 // import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
 // import DButton from "discourse/components/d-button";
@@ -26,10 +26,10 @@ export default class RequestTopicOpAdminForm extends Component {
 
   get textTemplate() {
     return (
-      I18n.t("topic_op_admin.apply_modal.apply_template").replaceAll(
+      i18n("topic_op_admin.apply_modal.apply_template").replaceAll(
         "#",
         `[${this.topic.title}](${this.topic.url})`
-      ) + `\n${I18n.t("topic_op_admin.apply_modal.apply_reason")}\n`
+      ) + `\n${i18n("topic_op_admin.apply_modal.apply_reason")}\n`
     );
   }
 
@@ -67,7 +67,7 @@ export default class RequestTopicOpAdminForm extends Component {
   showComposer() {
     this.composer.openNewMessage({
       recipients: this.currentUser.op_admin_form_recipients.join(","),
-      title: I18n.t(
+      title: i18n(
         "topic_op_admin.apply_modal.apply_template_title"
       ).replaceAll("#", this.topic.title),
       body: `${this.textTemplate}${this.reason}`,
