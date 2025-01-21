@@ -8,6 +8,7 @@ import { popupAjaxError } from "discourse/lib/ajax-error";
 export default class SetTopicOpAdminStatusModal extends Component {
   @service currentUser;
   @service dialog;
+  @service siteSettings;
   @tracked loading = false;
 
   get topic() {
@@ -16,6 +17,10 @@ export default class SetTopicOpAdminStatusModal extends Component {
 
   get enables() {
     return this.args.model.enables;
+  }
+
+  get canSetPostFolding() {
+    return this.siteSettings.discourse_post_folding_enabled;
   }
 
   @action

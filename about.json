@@ -1,0 +1,5 @@
+{
+  "tests": {
+    "requiredPlugins": ["https://github.com/Lhcfl/discourse-post-folding"]
+  }
+}

@@ -71,6 +71,19 @@
           </label>
         </div>
       {{/if}}
+      {{#if this.canSetPostFolding}}
+        <div class="control-group topic-op-admin-status plugins">
+          <hr />
+          <label>
+            {{input
+              id="topic-fold_posts-enable"
+              type="checkbox"
+              checked=this.enables.fold_posts
+            }}
+            <span>{{i18n "topic_op_admin.admin_modal.enable_fold_posts"}}</span>
+          </label>
+        </div>
+      {{/if}}
     </div>
   </:body>
   <:footer>

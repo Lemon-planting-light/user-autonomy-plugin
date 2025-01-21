@@ -18,7 +18,7 @@ export default class TopicOpAdminBannedUsers extends Component {
         ? String(u.banned_seconds / 60)
         : i18n("topic_op_admin.silence_modal.forever"),
       banned_at: new Date(u.banned_at).toLocaleString(),
-      in_unmute_user_ids: this.unmute_user_ids.has(u.id)
+      in_unmute_user_ids: this.unmute_user_ids.has(u.id),
     }));
   }
 

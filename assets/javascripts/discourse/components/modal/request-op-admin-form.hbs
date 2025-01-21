@@ -1,0 +1,50 @@
+<template>
+  <form class="request-op-admin-form">
+    <DModal
+      @title={{i18n "topic_op_admin.apply_for_op_admin"}}
+      @closeModal={{@closeModal}}
+    >
+      <:body>
+        <section class="reason">
+          <h3>
+            {{i18n "topic_op_admin.apply_modal.introduce_title"}}
+          </h3>
+          <p>
+            {{i18n "topic_op_admin.apply_modal.what_is"}}
+          </p>
+          <hr />
+        </section>
+        <div class="control-group">
+          <p>
+            {{i18n "topic_op_admin.apply_modal.tell_reason"}}
+          </p>
+
+          <DEditor
+            @change={{this.updateValue}}
+            class="form-kit__control-composer"
+            min-width="450px"
+            min-height="400px"
+            max-height="1000px"
+          />
+        </div>
+      </:body>
+      <:footer>
+        <DButton
+          @class="btn-primary"
+          @label="groups.membership_request.submit"
+          @action={{this.submit}}
+          @disabled={{this.loading}}
+        />
+        <DModalCancel @close={{@closeModal}} />
+        <ConditionalLoadingSpinner @size="small" @condition={{this.loading}} />
+        <div class="dock-right" style="margin-left: auto;margin-right: 0;">
+          <DButton
+            @class="btn-link"
+            @label="topic_op_admin.apply_modal.show_composer"
+            @action={{this.showComposer}}
+          />
+        </div>
+      </:footer>
+    </DModal>
+  </form>
+</template>

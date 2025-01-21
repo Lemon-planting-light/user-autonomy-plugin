@@ -16,17 +16,26 @@ if respond_to?(:register_svg_icon)
   register_svg_icon "envelope-open-text"
 end
 
-require_relative "app/lib/bot"
+module ::UserAutonomyModule
+  PLUGIN_NAME = "user-autonomy-plugin"
+end
+
+require_relative "lib/user_autonomy_module/engine"
 
 after_initialize do
-  %w[
-    app/controllers/topic_op_admin_controller
-    app/models/topic_op_admin_status
-    app/serializers/topic_op_admin_status_serializer
-    app/models/bot_logging_topic
-    app/lib/topic_op_admin_handle_new_posts
-    app/models/topic_op_banned_user
-  ].each { |f| require_relative File.expand_path("../#{f}", __FILE__) }
+  on(:post_created) do |*params|
+    return unless SiteSetting.topic_op_admin_enabled
+
+    post, _opt, user = params
+
+    if UserAutonomyModule::TopicOpBannedUser.isBanned?(post.topic_id, user.id)
+      if SiteSetting.topic_op_admin_delete_post_instead_of_hide?
+        PostDestroyer.new(Discourse.system_user, post).destroy
+      else
+        post.hide!(1, custom_message: "silenced_by_topic_OP")
+      end
+    end
+  end
 
   add_to_class(:user, :can_manipulate_topic_op_adminable?) do
     return true if admin?
@@ -42,9 +51,13 @@ after_initialize do
     user.can_manipulate_topic_op_adminable?
   end
 
-  add_to_class(:topic, :topic_op_admin_status?) { TopicOpAdminStatus.getRecord?(id) }
+  add_to_class(:topic, :topic_op_admin_status?) do
+    UserAutonomyModule::TopicOpAdminStatus.getRecord?(id)
+  end
   add_to_serializer(:topic_view, :topic_op_admin_status) do
-    TopicOpAdminStatusSerializer.new(topic.topic_op_admin_status?).as_json[:topic_op_admin_status]
+    UserAutonomyModule::TopicOpAdminStatusSerializer.new(topic.topic_op_admin_status?).as_json[
+      :topic_op_admin_status
+    ]
   end
 
   add_to_class(:guardian, :can_close_topic_as_op?) do |topic|
@@ -76,5 +89,10 @@ after_initialize do
     return true if user.admin? || user.moderator?
     return false if user.silenced_till
     topic.topic_op_admin_status?.can_silence && user.id == topic.user_id
+  end
+  add_to_class(:guardian, :can_fold_post_as_op?) do |topic|
+    return false unless SiteSetting.user_autonomy_plugin_enabled
+    return false if user.silenced_till
+    topic.topic_op_admin_status?.can_fold_posts && user.id == topic.user_id
   end
 end
