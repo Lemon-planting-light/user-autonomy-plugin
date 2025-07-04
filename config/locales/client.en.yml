@@ -58,6 +58,7 @@ en:
         enable_set_timer: "Allow OP to set topic timer"
         enable_silence: "Allow OP to silence other users in the topic"
         enable_fold_posts: "Allow OP to fold posts"
+  admin_js:
     admin:
       site_settings:
         categories:

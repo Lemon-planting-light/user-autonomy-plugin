@@ -58,6 +58,7 @@ zh_CN:
         enable_set_timer: "允许楼主设置话题计时器"
         enable_silence: "允许楼主在话题内禁言其他用户"
         enable_fold_posts: "允许楼主折叠帖子"
+  admin_js:
     admin:
       site_settings:
         categories:
