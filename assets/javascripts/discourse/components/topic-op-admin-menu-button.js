@@ -21,7 +21,14 @@ export default class TopicOpAdminMenuButton extends Component {
   @tracked updateTrigger = 1;
 
   get topic() {
-    return this.args.outletArgs?.model ?? this.args.outletArgs?.topic;
+    return this.args.model ?? this.args.topic;
+  }
+
+  static shouldRender(attrs, { currentUser }) {
+    if (currentUser == null || !currentUser.can_create_topic) return false;
+    const topic = attrs.topic ?? attrs.model;
+    if (topic == null || topic.isPrivateMessage) return false;
+    return true;
   }
 
   get showButton() {

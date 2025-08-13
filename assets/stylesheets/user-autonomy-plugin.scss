@@ -1,18 +1,14 @@
-.topic-footer-main-buttons-before-create-outlet
-  .topic-OP-admin-menu-button-container {
-  height: 100%;
-  .btn {
-    height: 100%;
+.desktop-view .timeline-controls {
+  flex-wrap: wrap;
+  & > button {
+    margin-right: 0.5em;
+    margin-bottom: 0.5em;
   }
 }
-span.topic-OP-admin-menu-button {
-  height: 100%;
-  .btn {
+#topic-progress-wrapper {
+  .topic-OP-admin-menu-button {
     height: 100%;
   }
-}
-.timeline-container .toggle-admin-menu {
-  margin-right: 0.5em;
 }
 table.topic-OP-admin-banned-users {
   color: var(--primary-high);

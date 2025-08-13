@@ -68,10 +68,10 @@ function init(api) {
 
   api.renderInOutlet("timeline-controls-before", TopicOpAdminMenuButton);
   api.renderInOutlet("before-topic-progress", TopicOpAdminMenuButton);
-  api.renderInOutlet(
-    "topic-footer-main-buttons-before-create",
-    TopicOpAdminMenuButton
-  );
+  // api.renderInOutlet(
+  //   "topic-footer-main-buttons-before-create",
+  //   TopicOpAdminMenuButton
+  // );
 }
 
 export default {

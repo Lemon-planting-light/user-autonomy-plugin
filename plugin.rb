@@ -9,7 +9,7 @@
 
 enabled_site_setting :user_autonomy_plugin_enabled
 
-register_asset "stylesheets/topic-op-admin.scss"
+register_asset "stylesheets/user-autonomy-plugin.scss"
 if respond_to?(:register_svg_icon)
   register_svg_icon "gear"
   register_svg_icon "gears"
