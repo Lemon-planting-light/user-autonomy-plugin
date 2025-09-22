@@ -35,8 +35,13 @@ end
 # Table name: topic_op_banned_user
 #
 #  id             :bigint           not null, primary key
-#  topic_id       :integer
-#  user_id        :integer
 #  banned_at      :datetime         not null
 #  banned_seconds :integer
+#  topic_id       :integer
+#  user_id        :integer
+#
+# Indexes
+#
+#  index_topic_op_banned_user_on_topic_id              (topic_id)
+#  index_topic_op_banned_user_on_topic_id_and_user_id  (topic_id,user_id) UNIQUE
 #
