@@ -53,3 +53,14 @@ table.topic-OP-admin-banned-users.new-ban td {
     }
   }
 }
+.control-group.topic-op-admin-status {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  & > div {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+  }
+}

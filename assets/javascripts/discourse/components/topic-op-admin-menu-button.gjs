@@ -15,6 +15,7 @@ import DMenu from "float-kit/components/d-menu";
 import DropdownMenu from "discourse/components/dropdown-menu";
 import DButton from "discourse/components/d-button";
 import concatClass from "discourse/helpers/concat-class";
+import { bind } from "discourse/lib/decorators";
 
 export default class TopicOpAdminMenuButton extends Component {
   static shouldRender(attrs, { currentUser }) {
@@ -32,8 +33,24 @@ export default class TopicOpAdminMenuButton extends Component {
   @service siteSettings;
   @service dialog;
   @service modal;
+  @service appEvents;
 
-  @tracked updateTrigger = 1;
+  @tracked trick = 1;
+
+  constructor() {
+    super(...arguments);
+    this.appEvents.on("user-autonomy:changed", this.onUserAutonomyChanged);
+  }
+
+  willDestroy() {
+    super.willDestroy(...arguments);
+    this.appEvents.off("user-autonomy:changed", this.onUserAutonomyChanged);
+  }
+
+  @bind
+  onUserAutonomyChanged() {
+    this.trick = this.trick + 1;
+  }
 
   get topic() {
     return this.args.model ?? this.args.topic;
@@ -61,12 +78,16 @@ export default class TopicOpAdminMenuButton extends Component {
   }
 
   get buttonList() {
-    (function () {})(this.updateTrigger); // Trigger
     /**
      * @typedef {{ label: string, icon: string, class: string, action: ()=>void, group?: string}} ButtonItem
      */
     /** @type {ButtonItem[]} */
     const res = [];
+
+    // trick
+    if (this.trick == 0) {
+      return;
+    }
 
     if (
       this.currentUser == null ||
@@ -191,30 +212,9 @@ export default class TopicOpAdminMenuButton extends Component {
 
   @action
   showSetTopicOpAdminStatus() {
-    const topic = this.topic;
-    const keys = [
-      "close",
-      "archive",
-      "make_PM",
-      "visible",
-      "slow_mode",
-      "set_timer",
-      "silence",
-      "fold_posts",
-    ];
     this.modal.show(SetTopicOpAdminStatusModal, {
       model: {
-        topic,
-        enables: Object.fromEntries(
-          keys.map((k) => [k, !!topic.topic_op_admin_status?.[`can_${k}`]])
-        ),
-        cb: (modal) => {
-          const new_status = Object.fromEntries(
-            keys.map((k) => [`can_${k}`, modal.enables[k]])
-          );
-          this.topic.set("topic_op_admin_status", new_status);
-          this.updateTrigger = 1;
-        },
+        topic: this.topic,
       },
     });
   }

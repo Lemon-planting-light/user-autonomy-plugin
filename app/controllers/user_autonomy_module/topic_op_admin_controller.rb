@@ -6,10 +6,6 @@ module ::UserAutonomyModule
     before_action :ensure_logged_in
 
     def update_topic_status
-      unless SiteSetting.topic_op_admin_enabled
-        return render_fail "topic_op_admin.not_enabled", status: 405
-      end
-
       params.require(:status)
       params.require(:enabled)
       params.permit(:until)
@@ -25,7 +21,7 @@ module ::UserAutonomyModule
       generate_with_perm_logger_text =
         begin
           enable_text = enabled ? ".enable" : ".disable"
-          "@#{guardian.user.username} " +
+          "@#{current_user.username} " +
             I18n.t("topic_op_admin.log_template.with_perm.#{status}.#{enable_text}").gsub(
               "#",
               topic.url,
@@ -63,10 +59,6 @@ module ::UserAutonomyModule
     end
 
     def update_slow_mode
-      unless SiteSetting.topic_op_admin_enabled
-        return render_fail "topic_op_admin.not_enabled", status: 405
-      end
-
       params.require(:id)
 
       topic = Topic.find(params[:id])
@@ -80,7 +72,7 @@ module ::UserAutonomyModule
       time = enabled && params[:enabled_until].present? ? params[:enabled_until] : nil
 
       ::UserAutonomyModule::Bot.botLogger(
-        "@#{guardian.user.username} " +
+        "@#{current_user.username} " +
           I18n.t(
             "topic_op_admin.log_template.with_perm.slow_mode." + (enabled ? "enable" : "disable"),
           ).gsub("#", topic.url) + "\n```\n#{params.to_yaml}\n```",
@@ -93,51 +85,44 @@ module ::UserAutonomyModule
     end
 
     def set_topic_op_admin_status
-      unless SiteSetting.topic_op_admin_enabled
-        return render_fail "topic_op_admin.not_enabled", status: 405
-      end
-
       params.require(:id)
-      params.require(:new_status)
-
-      topic = Topic.find(params[:id])
 
       guardian.ensure_can_manipulate_topic_op_adminable!
 
       permissions = normal_permissions
-      permissions += staff_permissions if guardian.user.staff?
-
-      ns = permissions.map { |perm| ["can_#{perm}", params[:new_status][perm.to_s]] }.to_h
+      permissions += staff_permissions if current_user.staff?
+      args = params.permit(:id, permissions).merge(is_default: false)      
+      topic = Topic.find_by(id: params[:id])
 
       ::UserAutonomyModule::Bot.botLogger(
-        "@#{guardian.user.username} " +
+        "@#{current_user.username} " +
           I18n.t("topic_op_admin.log_template.with_perm.set_admin_status").gsub("#", topic.url) +
-          "\n```\n#{params[:new_status].to_yaml}\n```",
+          "\n```\n#{args.to_yaml}\n```",
       )
 
-      TopicOpAdminStatus.updateRecord(params[:id], **ns)
+      topic.topic_op_admin_status&.destroy!
+      status = TopicOpAdminStatus.create!(args)
 
-      render json: success_json.merge!(topic_op_admin_status_update: params[:new_status])
+      ::MessageBus.publish "/user-autonomy/topic/#{params[:id]}",
+          TopicOpAdminStatusSerializer.new(status).as_json
+
+      head :ok
     end
 
     def request_for_topic_op_admin
-      unless SiteSetting.topic_op_admin_enabled
-        return render_fail "topic_op_admin.not_enabled", status: 405
-      end
-
       params.require(:id)
       params.require(:raw)
 
       topic = Topic.find(params[:id])
 
       ::UserAutonomyModule::Bot.botLogger(
-        "@#{guardian.user.username} " + I18n.t("topic_op_admin.apply_title").gsub("#", topic.url) +
-          ":\n[quote=\"#{guardian.user.username}\"]\n#{params[:raw]}\n[/quote]",
+        "@#{current_user.username} " + I18n.t("topic_op_admin.apply_title").gsub("#", topic.url) +
+          ":\n[quote=\"#{current_user.username}\"]\n#{params[:raw]}\n[/quote]",
       )
 
       post =
         PostCreator.create!(
-          guardian.user,
+          current_user,
           title: I18n.t("topic_op_admin.apply_title").gsub("#", topic.title),
           raw: params[:raw],
           archetype: Archetype.private_message,
@@ -212,10 +197,6 @@ module ::UserAutonomyModule
     end
 
     def set_topic_op_timer
-      unless SiteSetting.topic_op_admin_enabled
-        return render_fail "topic_op_admin.not_enabled", status: 405
-      end
-
       params.permit(:time, :based_on_last_post, :category_id)
       params.require(:status_type)
 
@@ -233,7 +214,7 @@ module ::UserAutonomyModule
       if !guardian.can_set_topic_timer_as_op?(topic) ||
            TopicTimer.destructive_types.values.include?(status_type)
         ::UserAutonomyModule::Bot.botLogger(
-          "@#{guardian.user.username} " +
+          "@#{current_user.username} " +
             I18n.t("topic_op_admin.log_template.without_perm.set_timer").gsub("#", topic.url) +
             "\n```\n#{params.to_yaml}\n```",
         )
@@ -255,7 +236,7 @@ module ::UserAutonomyModule
       end
 
       ::UserAutonomyModule::Bot.botLogger(
-        "@#{guardian.user.username} " +
+        "@#{current_user.username} " +
           I18n.t("topic_op_admin.log_template.with_perm.set_timer").gsub("#", topic.url) +
           "\n```\n#{params.to_yaml}\n```",
       )
@@ -275,10 +256,6 @@ module ::UserAutonomyModule
     end
 
     def topic_op_convert_topic
-      unless SiteSetting.topic_op_admin_enabled
-        return render_fail "topic_op_admin.not_enabled", status: 405
-      end
-
       params.require(:id)
       params.require(:type)
       params.require(:reason)
@@ -286,7 +263,7 @@ module ::UserAutonomyModule
 
       unless guardian.can_make_PM_as_op?(topic)
         ::UserAutonomyModule::Bot.botLogger(
-          "@#{guardian.user.username} " +
+          "@#{current_user.username} " +
             I18n.t("topic_op_admin.log_template.without_perm.make_PM.enable").gsub("#", topic.url) +
             "\n```\n#{params.to_yaml}\n```",
         )
@@ -295,7 +272,7 @@ module ::UserAutonomyModule
 
       if params[:type] == "public"
         ::UserAutonomyModule::Bot.botLogger(
-          "@#{guardian.user.username} " +
+          "@#{current_user.username} " +
             I18n.t("topic_op_admin.log_template.without_perm.make_PM.disable").gsub(
               "#",
               topic.url,
@@ -305,7 +282,7 @@ module ::UserAutonomyModule
       else
         converted_topic = topic.convert_to_private_message(current_user)
         ::UserAutonomyModule::Bot.botLogger(
-          "@#{guardian.user.username} " +
+          "@#{current_user.username} " +
             I18n.t("topic_op_admin.log_template.with_perm.make_PM.enable").gsub("#", topic.url) +
             "\n#{I18n.t("topic_op_admin.log_template.reason")} #{params[:reason]}",
         )
@@ -330,10 +307,6 @@ module ::UserAutonomyModule
     end
 
     def get_topic_op_banned_users
-      unless SiteSetting.topic_op_admin_enabled
-        return render_fail "topic_op_admin.not_enabled", status: 405
-      end
-
       params.require(:id)
 
       users = []
@@ -358,10 +331,6 @@ module ::UserAutonomyModule
     end
 
     def update_topic_op_banned_users
-      unless SiteSetting.topic_op_admin_enabled
-        return render_fail "topic_op_admin.not_enabled", status: 405
-      end
-
       params.require(:id)
       params.permit(:new_silence_users)
       params.permit(:new_unmute_users)
@@ -384,7 +353,7 @@ module ::UserAutonomyModule
 
       unless guardian.can_edit_topic_banned_user_list?(topic)
         ::UserAutonomyModule::Bot.botLogger(
-          "@#{guardian.user.username} " +
+          "@#{current_user.username} " +
             I18n.t("topic_op_admin.log_template.without_perm.silence").gsub("#", topic.url) +
             "\n```\n#{params.to_yaml}\n```",
         )
@@ -392,7 +361,7 @@ module ::UserAutonomyModule
       end
 
       ::UserAutonomyModule::Bot.botLogger(
-        "@#{guardian.user.username} " +
+        "@#{current_user.username} " +
           I18n.t("topic_op_admin.log_template.with_perm.silence").gsub("#", topic.url) +
           "\n```\n#{params.to_yaml}\n```",
       )
@@ -442,7 +411,7 @@ module ::UserAutonomyModule
       if !(mute_line == "" && unmute_line == "")
         ::UserAutonomyModule::Bot.botSendPost(
           topic.id,
-          "@#{guardian.user.username}\n\n" + unmute_line + mute_line +
+          "@#{current_user.username}\n\n" + unmute_line + mute_line +
             I18n.t("topic_op_admin.log_template.reason") + " #{params[:reason]}",
           skip_validations: true,
         )
@@ -466,11 +435,11 @@ module ::UserAutonomyModule
     private
 
     def normal_permissions
-      %i[close archive visible slow_mode set_timer fold_posts]
+      %i[can_close can_archive can_visible can_slow_mode can_set_timer can_fold_posts]
     end
 
     def staff_permissions
-      %i[make_PM silence]
+      %i[can_make_PM can_silence]
     end
   end
 end

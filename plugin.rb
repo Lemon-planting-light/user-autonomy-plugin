@@ -23,8 +23,10 @@ end
 require_relative "lib/user_autonomy_module/engine"
 
 after_initialize do
-  Topic.prepend UserAutonomyModule::TopicMixin
-  Guardian.prepend UserAutonomyModule::GuardianMixin
+  reloadable_patch do
+    Topic.prepend UserAutonomyModule::TopicMixin
+    Guardian.prepend UserAutonomyModule::GuardianMixin
+  end
 
   add_to_serializer(:current_user, :can_manipulate_topic_op_adminable?) do
     scope.can_manipulate_topic_op_adminable?

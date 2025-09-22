@@ -1,17 +1,50 @@
 import { ajax } from "discourse/lib/ajax";
-import { withPluginApi } from "discourse/lib/plugin-api";
+import { apiInitializer } from "discourse/lib/api";
+import { bind } from "discourse/lib/decorators";
 import Topic from "discourse/models/topic";
 import TopicTimer from "discourse/models/topic-timer";
 import TopicOpAdminMenuButton from "../components/topic-op-admin-menu-button";
 
-const pluginId = "topic-OP-admin";
+export default apiInitializer((api) => {
+  if (!api.container.lookup("service:site-settings").topic_op_admin_enabled) {
+    return;
+  }
 
-function init(api) {
   const currentUser = api.getCurrentUser();
 
   if (!currentUser) {
     return;
   }
+
+  api.modifyClass(
+    "controller:topic",
+    (Superclass) =>
+      class extends Superclass {
+        subscribe() {
+          super.subscribe(...arguments);
+          this.messageBus.subscribe(
+            `/user-autonomy/topic/${this.model.id}`,
+            this._onPostFoldingMessage
+          );
+        }
+
+        unsubscribe() {
+          this.messageBus.unsubscribe(
+            "/discourse-post-folding/topic/*",
+            this._onPostFoldingMessage
+          );
+          super.unsubscribe(...arguments);
+        }
+
+        @bind
+        _onPostFoldingMessage(msg) {
+          // console.log("received", msg);
+          // console.log(this.model);
+          this.set("model.topic_op_admin_status", msg.topic_op_admin_status);
+          this.appEvents.trigger("user-autonomy:changed");
+        }
+      }
+  );
 
   Topic.reopenClass({
     setSlowMode(topicId, seconds, enabledUntil) {
@@ -26,6 +59,7 @@ function init(api) {
       }
     },
   });
+
   TopicTimer.reopenClass({
     update(
       topicId,
@@ -72,15 +106,4 @@ function init(api) {
   //   "topic-footer-main-buttons-before-create",
   //   TopicOpAdminMenuButton
   // );
-}
-
-export default {
-  name: pluginId,
-
-  initialize(container) {
-    if (!container.lookup("service:site-settings").topic_op_admin_enabled) {
-      return;
-    }
-    withPluginApi("1.8.0", init);
-  },
-};
+});

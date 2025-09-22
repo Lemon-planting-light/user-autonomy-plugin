@@ -3,7 +3,7 @@
 ::UserAutonomyModule::Engine.routes.draw do
   post "/update_topic_status" => "topic_op_admin#update_topic_status"
   put "/update_slow_mode" => "topic_op_admin#update_slow_mode"
-  post "/set_topic_op_admin_status" => "topic_op_admin#set_topic_op_admin_status"
+  post "/set_topic_op_admin_status/:id" => "topic_op_admin#set_topic_op_admin_status"
   post "/request_for_topic_op_admin" => "topic_op_admin#request_for_topic_op_admin"
   post "/set_topic_op_timer" => "topic_op_admin#set_topic_op_timer"
   put "/topic_op_convert_topic" => "topic_op_admin#topic_op_convert_topic"
