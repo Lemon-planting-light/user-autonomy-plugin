@@ -7,7 +7,6 @@ en:
     topic_op_admin_logger_topic: "Under the premise of topic_op_admin_enable_topic_log, the topic id used for the bot's log"
     topic_op_admin_manipulatable_groups: "Groups that can manipulate OP-admin rights for a certain topic. (Admins can always operate)"
     topic_op_admin_require_reason_before_action: "Require reasons before OP-admin"
-    topic_op_admin_bot_override_user: "Use bot instead of the OP as the operator"
     topic_op_admin_never_be_banned_groups: "Users in these groups won't be silenced by the OP. Staff are always in the list."
     topic_op_admin_delete_post_instead_of_hide: "How to deal with users who are silenced by the host when they post in the building. When True, delete their posts. When False, autoflag and hide their posts."
     topic_op_admin_basic_autoallowing_categories: "For these categories of topics, the system will automatically approve the autonomy application of the OP and grant topic_op_admin_basic_list"

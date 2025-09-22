@@ -16,9 +16,6 @@ user_autonomy:
     type: integer
     min: -100
     client: false
-  topic_op_admin_bot_override_user:
-    default: false
-    client: false
   topic_op_admin_enable_topic_log:
     default: false
     client: false

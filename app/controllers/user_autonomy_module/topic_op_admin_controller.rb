@@ -5,14 +5,6 @@ module ::UserAutonomyModule
     requires_plugin PLUGIN_NAME
     before_action :ensure_logged_in
 
-    def get_user
-      if SiteSetting.topic_op_admin_bot_override_user?
-        ::UserAutonomyModule::Bot.getBot
-      else
-        guardian.user
-      end
-    end
-
     def update_topic_status
       unless SiteSetting.topic_op_admin_enabled
         return render_fail "topic_op_admin.not_enabled", status: 405
@@ -40,40 +32,16 @@ module ::UserAutonomyModule
             ) + "\n#{I18n.t("topic_op_admin.log_template.reason")} #{params[:reason]}"
         end
 
-      generate_without_perm_logger_text =
-        begin
-          enable_text = enabled ? ".enable" : ".disable"
-          "@#{guardian.user.username} " +
-            I18n.t("topic_op_admin.log_template.without_perm.#{status}.#{enable_text}").gsub(
-              "#",
-              topic.url,
-            ) + "\n#{I18n.t("topic_op_admin.log_template.reason")} #{params[:reason]}"
-        end
-
       puts generate_with_perm_logger_text
 
       case status
       when "closed"
-        unless guardian.can_close_topic_as_op?(topic)
-          ::UserAutonomyModule::Bot.botLogger(generate_without_perm_logger_text)
-          return render_fail "topic_op_admin.no_perm", status: 403
-        end
+        guardian.ensure_can_close_topic_as_op!(topic)
       when "visible"
-        unless guardian.can_unlist_topic_as_op?(topic)
-          ::UserAutonomyModule::Bot.botLogger(generate_without_perm_logger_text)
-          return render_fail "topic_op_admin.no_perm", status: 403
-        end
+        guardian.ensure_can_unlist_topic_as_op!(topic)
       when "archived"
-        unless guardian.can_archive_topic_as_op?(topic)
-          ::UserAutonomyModule::Bot.botLogger(generate_without_perm_logger_text)
-          return render_fail "topic_op_admin.no_perm", status: 403
-        end
+        guardian.ensure_can_archive_topic_as_op!(topic)
       else
-        ::UserAutonomyModule::Bot.botLogger(
-          "@#{guardian.user.username} " +
-            I18n.t("topic_op_admin.log_template.without_perm.otherwise").gsub("#", topic.url) +
-            "\n```\n#{params.to_yaml}\n```",
-        )
         return render_fail "topic_op_admin.no_perm", status: 403
       end
 
@@ -82,7 +50,7 @@ module ::UserAutonomyModule
       topic.update_status(
         status,
         enabled,
-        get_user,
+        current_user,
         until: params[:until],
         message: params[:reason] || I18n.t("topic_op_admin.reason_placeholder"),
       )
@@ -106,20 +74,10 @@ module ::UserAutonomyModule
       timer = TopicTimer.find_by(topic: topic, status_type: slow_mode_type)
 
       guardian.ensure_can_see_topic!(topic)
+      guardian.ensure_can_set_topic_slowmode_as_op!(topic)
 
       enabled = params[:seconds].to_i > 0
       time = enabled && params[:enabled_until].present? ? params[:enabled_until] : nil
-
-      unless guardian.can_set_topic_slowmode_as_op?(topic)
-        ::UserAutonomyModule::Bot.botLogger(
-          "@#{guardian.user.username} " +
-            I18n.t(
-              "topic_op_admin.log_template.without_perm.slow_mode." +
-                (enabled ? "enable" : "disable"),
-            ).gsub("#", topic.url) + "\n```\n#{params.to_yaml}\n```",
-        )
-        return render_fail "topic_op_admin.no_perm", status: 403
-      end
 
       ::UserAutonomyModule::Bot.botLogger(
         "@#{guardian.user.username} " +
@@ -144,29 +102,12 @@ module ::UserAutonomyModule
 
       topic = Topic.find(params[:id])
 
-      unless guardian.can_manipulate_topic_op_adminable?
-        ::UserAutonomyModule::Bot.botLogger(
-          "@#{guardian.user.username} " +
-            I18n.t("topic_op_admin.log_template.without_perm.set_admin_status").gsub(
-              "#",
-              topic.url,
-            ) + "\n```\n#{params[:new_status].to_yaml}\n```",
-        )
-        return render_fail "topic_op_admin.no_perm", status: 403
-      end
+      guardian.ensure_can_manipulate_topic_op_adminable!
 
-      ns = {
-        can_close: params[:new_status]["close"],
-        can_archive: params[:new_status]["archive"],
-        can_visible: params[:new_status]["visible"],
-        can_slow_mode: params[:new_status]["slow_mode"],
-        can_set_timer: params[:new_status]["set_timer"],
-        can_fold_posts: params[:new_status]["fold_posts"],
-      }
-      if guardian.user.admin? || guardian.user.moderator?
-        ns[:can_make_PM] = params[:new_status]["make_PM"]
-        ns[:can_silence] = params[:new_status]["silence"]
-      end
+      permissions = normal_permissions
+      permissions += staff_permissions if guardian.user.staff?
+
+      ns = permissions.map { |perm| ["can_#{perm}", params[:new_status][perm.to_s]] }.to_h
 
       ::UserAutonomyModule::Bot.botLogger(
         "@#{guardian.user.username} " +
@@ -362,7 +303,7 @@ module ::UserAutonomyModule
         )
         return render_fail "topic_op_admin.no_perm", status: 403
       else
-        converted_topic = topic.convert_to_private_message(get_user)
+        converted_topic = topic.convert_to_private_message(current_user)
         ::UserAutonomyModule::Bot.botLogger(
           "@#{guardian.user.username} " +
             I18n.t("topic_op_admin.log_template.with_perm.make_PM.enable").gsub("#", topic.url) +
@@ -373,10 +314,10 @@ module ::UserAutonomyModule
       to_revise_post = Post.find_by(topic_id: topic.id, post_number: topic.highest_post_number + 1)
 
       # 修订帖子
-      if to_revise_post.raw == "" && to_revise_post.user_id == get_user.id
-        PostRevisor.new(to_revise_post, topic).revise!(get_user, { raw: params[:reason] }, {})
+      if to_revise_post.raw == "" && to_revise_post.user_id == current_user.id
+        PostRevisor.new(to_revise_post, topic).revise!(current_user, { raw: params[:reason] }, {})
       else
-        PostCreator.create(get_user, topic_id: topic.id, raw: params[:reason])
+        PostCreator.create(current_user, topic_id: topic.id, raw: params[:reason])
       end
 
       render_topic_changes(converted_topic)
@@ -520,6 +461,16 @@ module ::UserAutonomyModule
       else
         render json: { success: false }
       end
+    end
+
+    private
+
+    def normal_permissions
+      %i[close archive visible slow_mode set_timer fold_posts]
+    end
+
+    def staff_permissions
+      %i[make_PM silence]
     end
   end
 end
