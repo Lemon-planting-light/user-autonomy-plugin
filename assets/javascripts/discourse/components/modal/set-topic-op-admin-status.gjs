@@ -1,17 +1,17 @@
 import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
-import { action } from "@ember/object";
-import { service } from "@ember/service";
-import { ajax } from "discourse/lib/ajax";
-import { popupAjaxError } from "discourse/lib/ajax-error";
-import DModal from "discourse/components/d-modal";
-import DButton from "discourse/components/d-button";
-import DModalCancel from "discourse/components/d-modal-cancel";
-import DToggleSwitch from "discourse/components/d-toggle-switch";
-import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
-import { i18n } from "discourse-i18n";
 import { fn } from "@ember/helper";
 import { on } from "@ember/modifier";
+import { action } from "@ember/object";
+import { service } from "@ember/service";
+import ConditionalLoadingSpinner from "discourse/components/conditional-loading-spinner";
+import DButton from "discourse/components/d-button";
+import DModal from "discourse/components/d-modal";
+import DModalCancel from "discourse/components/d-modal-cancel";
+import DToggleSwitch from "discourse/components/d-toggle-switch";
+import { ajax } from "discourse/lib/ajax";
+import { popupAjaxError } from "discourse/lib/ajax-error";
+import { i18n } from "discourse-i18n";
 
 const KEYS = [
   "can_close",
@@ -35,7 +35,6 @@ export default class SetTopicOpAdminStatusModal extends Component {
   constructor() {
     super(...arguments);
 
-    console.log(this.args.model.topic);
     this.status = Object.fromEntries(
       KEYS.map((k) => [
         k,

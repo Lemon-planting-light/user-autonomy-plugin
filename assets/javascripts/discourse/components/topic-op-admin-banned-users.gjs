@@ -76,14 +76,14 @@ export default class TopicOpAdminBannedUsers extends Component {
               <td class="operation">
                 {{#if u.in_unmute_user_ids}}
                   <DButton
-                    @class="btn topic-OP-admin-unmute-button"
+                    class="btn topic-OP-admin-unmute-button"
                     @icon="undo"
                     @label="topic_op_admin.silence_modal.recover"
                     @action={{fn this.mute u}}
                   />
                 {{else}}
                   <DButton
-                    @class="btn-danger topic-OP-admin-unmute-button"
+                    class="btn-danger topic-OP-admin-unmute-button"
                     @icon="times"
                     @label="topic_op_admin.silence_modal.unmute"
                     @action={{fn this.unmute u}}

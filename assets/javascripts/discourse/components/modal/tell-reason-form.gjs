@@ -61,7 +61,7 @@ export default class TellReasonForm extends Component {
 
         <:footer>
           <DButton
-            @class="btn-primary"
+            class="btn-primary"
             @label="ok_value"
             @action={{this.submit}}
             @disabled={{this.loading}}

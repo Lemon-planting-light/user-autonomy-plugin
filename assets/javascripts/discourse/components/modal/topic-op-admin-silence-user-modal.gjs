@@ -184,7 +184,7 @@ export default class TopicOpAdminSilenceUserModal extends Component {
       </:body>
       <:footer>
         <DButton
-          @class="btn-primary"
+          class="btn-primary"
           @label="ok_value"
           @action={{this.submit}}
           @disabled={{this.submitting}}

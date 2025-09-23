@@ -2,20 +2,21 @@ import Component from "@glimmer/component";
 import { tracked } from "@glimmer/tracking";
 import { action } from "@ember/object";
 import { service } from "@ember/service";
+import DButton from "discourse/components/d-button";
+import DropdownMenu from "discourse/components/dropdown-menu";
 import EditSlowModeModal from "discourse/components/modal/edit-slow-mode";
 import EditTopicTimerModal from "discourse/components/modal/edit-topic-timer";
+import concatClass from "discourse/helpers/concat-class";
+import icon from "discourse/helpers/icon";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
+import { bind } from "discourse/lib/decorators";
 import { i18n } from "discourse-i18n";
+import DMenu from "float-kit/components/d-menu";
 import RequestTopicOpAdminForm from "./modal/request-op-admin-form";
 import SetTopicOpAdminStatusModal from "./modal/set-topic-op-admin-status";
 import TellReasonForm from "./modal/tell-reason-form";
 import TopicOpAdminSilenceUserModal from "./modal/topic-op-admin-silence-user-modal";
-import DMenu from "float-kit/components/d-menu";
-import DropdownMenu from "discourse/components/dropdown-menu";
-import DButton from "discourse/components/d-button";
-import concatClass from "discourse/helpers/concat-class";
-import { bind } from "discourse/lib/decorators";
 
 export default class TopicOpAdminMenuButton extends Component {
   static shouldRender(attrs, { currentUser }) {
@@ -85,7 +86,7 @@ export default class TopicOpAdminMenuButton extends Component {
     const res = [];
 
     // trick
-    if (this.trick == 0) {
+    if (this.trick === 0) {
       return;
     }
 
