@@ -12,6 +12,7 @@ module UserAutonomyModule
       old = self.find_by(id: params[:id])
       if old.present?
         old.update!(is_default: false, **params)
+        old
       else
         self.create!(params)
       end
