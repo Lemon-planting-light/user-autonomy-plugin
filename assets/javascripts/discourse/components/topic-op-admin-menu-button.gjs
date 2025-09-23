@@ -7,7 +7,7 @@ import DropdownMenu from "discourse/components/dropdown-menu";
 import EditSlowModeModal from "discourse/components/modal/edit-slow-mode";
 import EditTopicTimerModal from "discourse/components/modal/edit-topic-timer";
 import concatClass from "discourse/helpers/concat-class";
-import icon from "discourse/helpers/icon";
+import icon from "discourse/helpers/d-icon";
 import { ajax } from "discourse/lib/ajax";
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { bind } from "discourse/lib/decorators";
@@ -348,7 +348,6 @@ export default class TopicOpAdminMenuButton extends Component {
             @modalForMobile={{true}}
             @autofocus={{true}}
             @triggerClass="btn-default btn-icon toggle-OP-admin-menu"
-            @icon="gear"
           >
             <:trigger>
               {{icon "gear"}}
