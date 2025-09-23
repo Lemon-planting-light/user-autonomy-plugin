@@ -91,6 +91,12 @@ user_autonomy:
     list_type: compact
     default: ""
     allow_any: false
+  topic_op_admin_tags_autogrant_can_fold_posts:
+    client: false
+    type: tag_list
+    list_type: compact
+    default: ""
+    allow_any: false
   topic_op_admin_require_reason_before_action:
     default: true
     client: true

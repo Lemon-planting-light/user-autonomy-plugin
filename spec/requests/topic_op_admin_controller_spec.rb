@@ -18,9 +18,25 @@ RSpec.describe UserAutonomyModule::TopicOpAdminController do
   fab!(:allowed_user) { Fabricate(:user, username: "mads", name: "Mads", groups: [allowed_group]) }
   fab!(:user)
 
-  fab!(:topic)
+  fab!(:tag1) { Fabricate(:tag) }
+  fab!(:tag2) { Fabricate(:tag) }
+
+  fab!(:topic) { Fabricate(:topic, tags: [tag1, tag2]) }
   fab!(:post_1) { Fabricate(:post, topic: topic, post_number: 1) }
   fab!(:post_2) { Fabricate(:post, topic: topic, post_number: 2) }
+
+  NORMAL_PERMISSIONS = %i[
+    can_close
+    can_archive
+    can_visible
+    can_slow_mode
+    can_set_timer
+    can_fold_posts
+  ]
+
+  STAFF_PERMISSIONS = %i[can_make_PM can_silence]
+
+  ALL_PERMISSIONS = NORMAL_PERMISSIONS + STAFF_PERMISSIONS
 
   describe "#set_topic_op_admin_status" do
     context "when user is not authorized" do
@@ -28,18 +44,9 @@ RSpec.describe UserAutonomyModule::TopicOpAdminController do
 
       it "cannot set topic_op_admin_status for a topic" do
         expect(topic.topic_op_admin_status).to be_nil
-
         post "/topic-op-admin/set-topic-op-admin-status/#{topic.id}.json",
-             params: {
-               can_close: true,
-               can_archive: true,
-               can_make_PM: true,
-               can_visible: true,
-               can_slow_mode: true,
-               can_set_timer: true,
-               can_silence: true,
-               can_fold_posts: true,
-             }
+             params: ALL_PERMISSIONS.map { |perm| [perm, true] }.to_h
+
         expect(response.status).to eq(403)
 
         topic.reload
@@ -54,29 +61,12 @@ RSpec.describe UserAutonomyModule::TopicOpAdminController do
         expect(topic.topic_op_admin_status).to be_nil
 
         post "/topic-op-admin/set-topic-op-admin-status/#{topic.id}.json",
-             params: {
-               can_close: true,
-               can_archive: true,
-               can_make_PM: true,
-               can_visible: true,
-               can_slow_mode: true,
-               can_set_timer: true,
-               can_silence: true,
-               can_fold_posts: true,
-             }
+             params: ALL_PERMISSIONS.map { |perm| [perm, true] }.to_h
+
         expect(response.status).to eq(200)
 
         topic.reload
-        expect(topic.topic_op_admin_status).to be_present
-        expect(topic.topic_op_admin_status.can_close).to eq(true)
-        expect(topic.topic_op_admin_status.can_archive).to eq(true)
-        expect(topic.topic_op_admin_status.can_visible).to eq(true)
-        expect(topic.topic_op_admin_status.can_slow_mode).to eq(true)
-        expect(topic.topic_op_admin_status.can_set_timer).to eq(true)
-        expect(topic.topic_op_admin_status.can_silence).to eq(true)
-        expect(topic.topic_op_admin_status.can_make_PM).to eq(true)
-        expect(topic.topic_op_admin_status.can_fold_posts).to eq(true)
-        expect(topic.topic_op_admin_status.is_default).to eq(false)
+        ALL_PERMISSIONS.each { |perm| expect(topic.topic_op_admin_status.send(perm)).to eq(true) }
       end
     end
 
@@ -87,65 +77,129 @@ RSpec.describe UserAutonomyModule::TopicOpAdminController do
         expect(topic.topic_op_admin_status).to be_nil
 
         post "/topic-op-admin/set-topic-op-admin-status/#{topic.id}.json",
-             params: {
-               can_close: true,
-               can_archive: true,
-               can_make_PM: true,
-               can_visible: true,
-               can_slow_mode: true,
-               can_set_timer: true,
-               can_silence: true,
-               can_fold_posts: true,
-             }
+             params: ALL_PERMISSIONS.map { |perm| [perm, true] }.to_h
         expect(response.status).to eq(200)
 
         topic.reload
-        expect(topic.topic_op_admin_status).to be_present
-        expect(topic.topic_op_admin_status.can_close).to eq(true)
-        expect(topic.topic_op_admin_status.can_archive).to eq(true)
-        expect(topic.topic_op_admin_status.can_visible).to eq(true)
-        expect(topic.topic_op_admin_status.can_slow_mode).to eq(true)
-        expect(topic.topic_op_admin_status.can_set_timer).to eq(true)
-        expect(topic.topic_op_admin_status.can_silence).to eq(false)
-        expect(topic.topic_op_admin_status.can_make_PM).to eq(false)
-        expect(topic.topic_op_admin_status.can_fold_posts).to eq(true)
+        NORMAL_PERMISSIONS.each do |perm|
+          expect(topic.topic_op_admin_status.send(perm)).to eq(true)
+        end
+        STAFF_PERMISSIONS.each do |perm|
+          expect(topic.topic_op_admin_status.send(perm)).to eq(false)
+        end
       end
 
       it "won't affect existing topic_op_admin_status's staff params" do
         Fabricate(
           :topic_op_admin_status,
           id: topic.id,
-          can_close: true,
-          can_archive: true,
-          can_make_PM: true,
-          can_visible: true,
-          can_slow_mode: true,
-          can_set_timer: true,
-          can_silence: true,
-          can_fold_posts: true,
+          **ALL_PERMISSIONS.map { |perm| [perm, true] }.to_h,
         )
 
         post "/topic-op-admin/set-topic-op-admin-status/#{topic.id}.json",
-             params: {
-               can_close: false,
-               can_archive: false,
-               can_make_PM: false,
-               can_visible: false,
-               can_slow_mode: false,
-               can_set_timer: false,
-               can_silence: false,
-               can_fold_posts: false,
-             }
+             params: ALL_PERMISSIONS.map { |perm| [perm, false] }.to_h
 
-        expect(topic.topic_op_admin_status).to be_present
-        expect(topic.topic_op_admin_status.can_close).to eq(false)
-        expect(topic.topic_op_admin_status.can_archive).to eq(false)
-        expect(topic.topic_op_admin_status.can_visible).to eq(false)
-        expect(topic.topic_op_admin_status.can_slow_mode).to eq(false)
-        expect(topic.topic_op_admin_status.can_set_timer).to eq(false)
-        expect(topic.topic_op_admin_status.can_silence).to eq(true)
-        expect(topic.topic_op_admin_status.can_make_PM).to eq(true)
-        expect(topic.topic_op_admin_status.can_fold_posts).to eq(false)
+        NORMAL_PERMISSIONS.each do |perm|
+          expect(topic.topic_op_admin_status.send(perm)).to eq(false)
+        end
+        STAFF_PERMISSIONS.each { |perm| expect(topic.topic_op_admin_status.send(perm)).to eq(true) }
+      end
+    end
+  end
+
+  describe "#request_for" do
+    context "when user is not the owner" do
+      before { sign_in(user) }
+
+      it "cannot create a request post" do
+        post "/topic-op-admin/request-for/#{topic.id}.json",
+             params: {
+               raw: "Please change the topic status.",
+             }
+        expect(response.status).to eq(403)
+        expect(topic.topic_op_admin_status).to be_nil
+      end
+    end
+
+    context "when user is the owner" do
+      before { sign_in(topic.user) }
+
+      it "creates a request message to allowed_groups" do
+        post "/topic-op-admin/request-for/#{topic.id}.json",
+             params: {
+               raw: "Please change the topic status.",
+             }
+        expect(response.status).to eq(200)
+
+        last_topic = Topic.last
+        expect(last_topic.user).to eq(topic.user)
+        expect(last_topic.archetype).to eq(Archetype.private_message)
+        expect(last_topic.first_post.raw).to eq("Please change the topic status.")
+        expect(last_topic.allowed_users).to include(topic.user)
+        expect(last_topic.allowed_groups.pluck(:id)).to match_array(
+          SiteSetting.topic_op_admin_manipulatable_groups_map,
+        )
+        expect(topic.topic_op_admin_status).to be_nil
+      end
+
+      it "automatically grants base permissions based on tag" do
+        SiteSetting.topic_op_admin_basic_autoallowing_tags = tag1.name
+
+        post "/topic-op-admin/request-for/#{topic.id}.json",
+             params: {
+               raw: "Please change the topic status.",
+             }
+        expect(response.status).to eq(200)
+
+        ALL_PERMISSIONS.each do |perm|
+          if SiteSetting.topic_op_admin_basic_list_map.include?(perm.to_s)
+            expect(topic.topic_op_admin_status.send(perm)).to eq(true)
+          else
+            expect(topic.topic_op_admin_status.send(perm)).to eq(false)
+          end
+        end
+      end
+
+      it "automatically grants base permissions based on category" do
+        SiteSetting.topic_op_admin_basic_autoallowing_categories = topic.category.id.to_s
+
+        post "/topic-op-admin/request-for/#{topic.id}.json",
+             params: {
+               raw: "Please change the topic status.",
+             }
+        expect(response.status).to eq(200)
+
+        ALL_PERMISSIONS.each do |perm|
+          if SiteSetting.topic_op_admin_basic_list_map.include?(perm.to_s)
+            expect(topic.topic_op_admin_status.send(perm)).to eq(true)
+          else
+            expect(topic.topic_op_admin_status.send(perm)).to eq(false)
+          end
+        end
+      end
+
+      5.times do
+        random_perms = ALL_PERMISSIONS.sample(3)
+
+        it "automatically grants permissions based on tag - tries #{random_perms}" do
+          random_perms.each do |perm|
+            SiteSetting.send(
+              "topic_op_admin_tags_autogrant_#{perm}=",
+              [tag1.name, tag2.name].sample,
+            )
+          end
+
+          post "/topic-op-admin/request-for/#{topic.id}.json",
+               params: {
+                 raw: "Please change the topic status.",
+               }
+          expect(response.status).to eq(200)
+
+          random_perms.each { |perm| expect(topic.topic_op_admin_status.send(perm)).to eq(true) }
+          (ALL_PERMISSIONS - random_perms).each do |perm|
+            expect(topic.topic_op_admin_status.send(perm)).to eq(false)
+          end
+        end
       end
     end
   end

@@ -108,11 +108,15 @@ module ::UserAutonomyModule
       head :ok
     end
 
-    def request_for_topic_op_admin
+    def request_for
       params.require(:id)
       params.require(:raw)
 
       topic = Topic.find(params[:id])
+
+      unless current_user.id == topic.user.id
+        raise Discourse::InvalidAccess.new "not the topic owner"
+      end
 
       ::UserAutonomyModule::Bot.botLogger(
         "@#{current_user.username} " + I18n.t("topic_op_admin.apply_title").gsub("#", topic.url) +
@@ -133,65 +137,43 @@ module ::UserAutonomyModule
         )
 
       unless topic.topic_op_admin_status&.is_not_default?
-        ns = {}
-        ds = {}
-        changed = false
+        auto_allowed =
+          all_permissions.select do |perm|
+            SiteSetting.send("topic_op_admin_tags_autogrant_#{perm}_map").intersect?(
+              topic.tags.pluck(:name),
+            )
+          end
 
-        if SiteSetting
-             .topic_op_admin_basic_autoallowing_tags
-             .to_s
-             .split("|")
-             .intersect?(topic.tags.map(&:name)) ||
+        if SiteSetting.topic_op_admin_basic_autoallowing_tags_map.intersect?(
+             topic.tags.pluck(:name),
+           ) ||
              SiteSetting
                .topic_op_admin_basic_autoallowing_categories
-               .to_s
                .split("|")
-               .map(&:to_i)
-               .include?(topic.category&.id)
-          SiteSetting.topic_op_admin_basic_list.split("|").each { |i| changed = ds[i] = true }
+               .include?(topic.category&.id.to_s)
+          auto_allowed += SiteSetting.topic_op_admin_basic_list_map
         end
 
-        %w[
-          can_close
-          can_visible
-          can_make_PM
-          can_archive
-          can_set_timer
-          can_silence
-          can_slow_mode
-        ].each do |status|
-          if SiteSetting
-               .method("topic_op_admin_tags_autogrant_#{status}")
-               .call()
-               .to_s
-               .split("|")
-               .intersect?(topic.tags.map(&:name))
-            changed = ds[status] = true
-          end
-        end
-
-        ns = {
-          can_close: ds["can_close"] || false,
-          can_archive: ds["can_archive"] || false,
-          can_make_PM: ds["can_make_PM"] || false,
-          can_visible: ds["can_visible"] || false,
-          can_slow_mode: ds["can_slow_mode"] || false,
-          can_set_timer: ds["can_set_timer"] || false,
-          can_silence: ds["can_silence"] || false,
-          can_fold_posts: ds["can_fold_posts"] || false,
-        }
-
-        if changed
+        if auto_allowed.present?
           PostCreator.create!(
             Discourse.system_user,
             topic_id: post.topic_id,
             raw: I18n.t("topic_op_admin.autoallowing_request"),
             skip_validations: true,
           )
-        end
 
-        TopicOpAdminStatus.updateRecord(topic.id, **ns)
+          status =
+            TopicOpAdminStatus.create_or_update!(
+              id: topic.id,
+              is_default: true,
+              **auto_allowed.map { |perm| [perm.to_s, true] }.to_h,
+            )
+
+          ::MessageBus.publish "/user-autonomy/topic/#{params[:id]}",
+                               TopicOpAdminStatusSerializer.new(status).as_json
+        end
       end
+
       render json: success_json.merge!(message: I18n.t("topic_op_admin.get_request"))
     end
 
@@ -439,6 +421,10 @@ module ::UserAutonomyModule
 
     def staff_permissions
       %i[can_make_PM can_silence]
+    end
+
+    def all_permissions
+      normal_permissions + staff_permissions
     end
   end
 end
