@@ -130,9 +130,7 @@ module ::UserAutonomyModule
           raw: params[:raw],
           archetype: Archetype.private_message,
           target_group_names:
-            SiteSetting.topic_op_admin_manipulatable_groups_map.map do |id|
-              Group.find_by(id:).name
-            end,
+            Group.where(id: SiteSetting.topic_op_admin_manipulatable_groups_map).pluck(:name),
           skip_validations: true,
         )
 

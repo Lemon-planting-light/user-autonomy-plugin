@@ -61,20 +61,6 @@ export default class RequestTopicOpAdminForm extends Component {
       .catch(popupAjaxError);
   }
 
-  @action
-  showComposer() {
-    this.composer.openNewMessage({
-      recipients: this.currentUser.op_admin_form_recipients.join(","),
-      title: i18n("topic_op_admin.apply_modal.apply_template_title").replaceAll(
-        "#",
-        this.topic.title
-      ),
-      body: `${this.textTemplate}${this.reason}`,
-      hasGroups: true,
-    });
-    this.close();
-  }
-
   <template>
     <form class="request-op-admin-form">
       <DModal
@@ -117,13 +103,6 @@ export default class RequestTopicOpAdminForm extends Component {
             @size="small"
             @condition={{this.loading}}
           />
-          <div class="dock-right" style="margin-left: auto;margin-right: 0;">
-            <DButton
-              class="btn-link"
-              @label="topic_op_admin.apply_modal.show_composer"
-              @action={{this.showComposer}}
-            />
-          </div>
         </:footer>
       </DModal>
     </form>
