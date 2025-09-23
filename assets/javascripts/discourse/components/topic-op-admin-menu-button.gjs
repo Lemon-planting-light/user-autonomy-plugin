@@ -340,33 +340,40 @@ export default class TopicOpAdminMenuButton extends Component {
 
   <template>
     {{#if this.showButton}}
-      <DMenu
-        @identifier="topic-OP-admin-menu"
-        @modalForMobile={{true}}
-        @autofocus={{true}}
-        @triggerClass="btn-default btn-icon topic-OP-admin-menu-button"
-        @icon="gear"
-      >
-        <:content>
-          <DropdownMenu as |dropdown|>
-            {{#each this.buttonListGrouped as |button|}}
-              {{#if button}}
-                <dropdown.item>
-                  <DButton
-                    @label={{button.label}}
-                    @translatedLabel={{button.translatedLabel}}
-                    @icon={{button.icon}}
-                    class={{concatClass "btn-transparent" button.className}}
-                    @action={{button.action}}
-                  />
-                </dropdown.item>
-              {{else}}
-                <dropdown.divider />
-              {{/if}}
-            {{/each}}
-          </DropdownMenu>
-        </:content>
-      </DMenu>
+      <span class="topic-OP-admin-menu-button-container">
+        <span class="topic-OP-admin-menu-button">
+          <DMenu
+            @identifier="topic-OP-admin-menu"
+            @modalForMobile={{true}}
+            @autofocus={{true}}
+            @triggerClass="btn-default btn-icon toggle-OP-admin-menu"
+            @icon="gear"
+          >
+            <:trigger>
+              {{icon "gear"}}
+            </:trigger>
+            <:content>
+              <DropdownMenu as |dropdown|>
+                {{#each this.buttonListGrouped as |button|}}
+                  {{#if button}}
+                    <dropdown.item>
+                      <DButton
+                        @label={{button.label}}
+                        @translatedLabel={{button.translatedLabel}}
+                        @icon={{button.icon}}
+                        class={{concatClass "btn-transparent" button.className}}
+                        @action={{button.action}}
+                      />
+                    </dropdown.item>
+                  {{else}}
+                    <dropdown.divider />
+                  {{/if}}
+                {{/each}}
+              </DropdownMenu>
+            </:content>
+          </DMenu>
+        </span>
+      </span>
     {{/if}}
   </template>
 }
