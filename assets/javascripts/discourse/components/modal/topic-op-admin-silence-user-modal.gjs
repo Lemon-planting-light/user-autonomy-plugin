@@ -33,7 +33,7 @@ export default class TopicOpAdminSilenceUserModal extends Component {
   }
 
   loadBannedUsers() {
-    ajax("/topic_op_admin/get_topic_op_banned_users", {
+    ajax("/topic-op-admin/get_topic_op_banned_users", {
       method: "GET",
       data: {
         id: this.topic.id,
@@ -89,7 +89,7 @@ export default class TopicOpAdminSilenceUserModal extends Component {
       return;
     }
     this.submitting = true;
-    ajax("/topic_op_admin/update_topic_op_banned_users", {
+    ajax("/topic-op-admin/update_topic_op_banned_users", {
       method: "PUT",
       data: {
         id: this.topic.id,

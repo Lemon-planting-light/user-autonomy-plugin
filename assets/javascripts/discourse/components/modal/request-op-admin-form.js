@@ -46,7 +46,7 @@ export default class RequestTopicOpAdminForm extends Component {
   @action
   submit() {
     this.loading = true;
-    ajax("/topic_op_admin/request_for_topic_op_admin", {
+    ajax("/topic-op-admin/request_for_topic_op_admin", {
       method: "POST",
       data: {
         id: this.topic.id,

@@ -248,7 +248,7 @@ export default class TopicOpAdminMenuButton extends Component {
 
   toggleTopicStatus(key, reason) {
     return this._send_ajax(
-      "/topic_op_admin/update_topic_status/",
+      "/topic-op-admin/update_topic_status/",
       "POST",
       {
         status: key,
@@ -260,7 +260,7 @@ export default class TopicOpAdminMenuButton extends Component {
 
   convertTopic(type, reason) {
     return this._send_ajax(
-      "/topic_op_admin/topic_op_convert_topic",
+      "/topic-op-admin/topic_op_convert_topic",
       "PUT",
       {
         type,

@@ -55,7 +55,7 @@ export default apiInitializer((api) => {
         return ajax(`/t/${topicId}/slow_mode`, { type: "PUT", data });
       } else {
         data.id = topicId;
-        return ajax("/topic_op_admin/update_slow_mode", { type: "PUT", data });
+        return ajax("/topic-op-admin/update_slow_mode", { type: "PUT", data });
       }
     },
   });
@@ -92,7 +92,7 @@ export default apiInitializer((api) => {
       } else {
         data.id = topicId;
         return ajax({
-          url: `/topic_op_admin/set_topic_op_timer`,
+          url: `/topic-op-admin/set_topic_op_timer`,
           type: "POST",
           data,
         });

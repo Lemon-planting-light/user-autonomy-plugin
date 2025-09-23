@@ -70,7 +70,7 @@ export default class SetTopicOpAdminStatusModal extends Component {
       return;
     }
     this.loading = true;
-    ajax(`/topic_op_admin/set_topic_op_admin_status/${this.topic.id}`, {
+    ajax(`/topic-op-admin/set-topic-op-admin-status/${this.topic.id}`, {
       method: "POST",
       data: this.status,
     })

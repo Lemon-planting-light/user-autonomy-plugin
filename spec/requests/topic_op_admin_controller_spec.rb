@@ -29,7 +29,7 @@ RSpec.describe UserAutonomyModule::TopicOpAdminController do
       it "cannot set topic_op_admin_status for a topic" do
         expect(topic.topic_op_admin_status).to be_nil
 
-        post "/topic_op_admin/set_topic_op_admin_status/#{topic.id}.json",
+        post "/topic-op-admin/set-topic-op-admin-status/#{topic.id}.json",
              params: {
                can_close: true,
                can_archive: true,
@@ -53,7 +53,7 @@ RSpec.describe UserAutonomyModule::TopicOpAdminController do
       it "can set topic_op_admin_status for a topic" do
         expect(topic.topic_op_admin_status).to be_nil
 
-        post "/topic_op_admin/set_topic_op_admin_status/#{topic.id}.json",
+        post "/topic-op-admin/set-topic-op-admin-status/#{topic.id}.json",
              params: {
                can_close: true,
                can_archive: true,
@@ -86,7 +86,7 @@ RSpec.describe UserAutonomyModule::TopicOpAdminController do
       it "can set topic_op_admin_status for a topic, but not staff params" do
         expect(topic.topic_op_admin_status).to be_nil
 
-        post "/topic_op_admin/set_topic_op_admin_status/#{topic.id}.json",
+        post "/topic-op-admin/set-topic-op-admin-status/#{topic.id}.json",
              params: {
                can_close: true,
                can_archive: true,
@@ -125,7 +125,7 @@ RSpec.describe UserAutonomyModule::TopicOpAdminController do
           can_fold_posts: true,
         )
 
-        post "/topic_op_admin/set_topic_op_admin_status/#{topic.id}.json",
+        post "/topic-op-admin/set-topic-op-admin-status/#{topic.id}.json",
              params: {
                can_close: false,
                can_archive: false,
