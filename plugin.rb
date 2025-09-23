@@ -2,7 +2,7 @@
 
 # name: user-autonomy-plugin
 # about: Give topic's op some admin function
-# version: 0.2.1
+# version: 0.3.0
 # authors: Lhc_fl
 # url: https://github.com/Lemon-planting-light/user-autonomy-plugin
 # required_version: 3.0.0
