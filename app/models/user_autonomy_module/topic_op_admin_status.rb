@@ -21,6 +21,14 @@ module UserAutonomyModule
     def is_not_default?
       !is_default
     end
+
+    def self.create_or_update!(params)
+      if self.exists?(id: params[:id])
+        self.find_by(id: params[:id]).update!(is_default: false, **params)
+      else
+        self.create(params)
+      end
+    end
   end
 end
 

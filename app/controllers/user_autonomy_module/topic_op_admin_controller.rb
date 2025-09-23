@@ -100,8 +100,7 @@ module ::UserAutonomyModule
           "\n```\n#{args.to_yaml}\n```",
       )
 
-      topic.topic_op_admin_status&.destroy!
-      status = TopicOpAdminStatus.create!(args)
+      status = TopicOpAdminStatus.create_or_update!(args)
 
       ::MessageBus.publish "/user-autonomy/topic/#{params[:id]}",
                            TopicOpAdminStatusSerializer.new(status).as_json

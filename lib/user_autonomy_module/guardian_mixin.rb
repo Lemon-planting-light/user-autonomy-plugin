@@ -65,7 +65,7 @@ module UserAutonomyModule
 
       def can_manipulate_topic_op_adminable?
         return true if is_admin?
-        in_any_groups?(SiteSetting.topic_op_admin_manipulatable_groups_map)
+        user.in_any_groups?(SiteSetting.topic_op_admin_manipulatable_groups_map)
       end
     end
   end
