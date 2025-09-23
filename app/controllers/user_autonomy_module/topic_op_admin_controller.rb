@@ -91,7 +91,7 @@ module ::UserAutonomyModule
 
       permissions = normal_permissions
       permissions += staff_permissions if current_user.staff?
-      args = params.permit(:id, permissions).merge(is_default: false)      
+      args = params.permit(:id, permissions).merge(is_default: false)
       topic = Topic.find_by(id: params[:id])
 
       ::UserAutonomyModule::Bot.botLogger(
@@ -104,7 +104,7 @@ module ::UserAutonomyModule
       status = TopicOpAdminStatus.create!(args)
 
       ::MessageBus.publish "/user-autonomy/topic/#{params[:id]}",
-          TopicOpAdminStatusSerializer.new(status).as_json
+                           TopicOpAdminStatusSerializer.new(status).as_json
 
       head :ok
     end
@@ -133,7 +133,7 @@ module ::UserAutonomyModule
           skip_validations: true,
         )
 
-      if topic.topic_op_admin_status?.is_default
+      unless topic.topic_op_admin_status&.is_not_default?
         ns = {}
         ds = {}
         changed = false

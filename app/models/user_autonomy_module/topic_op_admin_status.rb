@@ -17,6 +17,10 @@ module UserAutonomyModule
         self.create(id: id, **new_status)
       end
     end
+
+    def is_not_default?
+      !is_default
+    end
   end
 end
 
